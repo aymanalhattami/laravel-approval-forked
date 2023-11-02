@@ -14,7 +14,7 @@ class CreateModificationRelationsTable extends Migration
     public function up()
     {
         Schema::create('modification_relations', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->foreignId('modification_id')->constrained()->noActionOnDelete();
             $table->string('model');
             $table->string('model_relation_column');
