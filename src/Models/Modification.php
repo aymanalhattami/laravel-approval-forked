@@ -62,6 +62,11 @@ class Modification extends Model
         return $this->hasMany(config('approval.models.disapproval', \Approval\Models\Disapproval::class));
     }
 
+    public function modificationRelations()
+    {
+        return $this->hasMany(config('approval.models.modificationRelation', \Approval\Models\ModificationRelation::class));
+    }
+
     /**
      * Get the number of approvals reamaining for the changes
      * to be approved and approval will close.
