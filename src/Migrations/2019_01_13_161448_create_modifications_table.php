@@ -14,7 +14,7 @@ class CreateModificationsTable extends Migration
     public function up()
     {
         Schema::create('modifications', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->integer('modifiable_id')->nullable();
             $table->string('modifiable_type')->nullable();
             $table->integer('modifier_id')->nullable();

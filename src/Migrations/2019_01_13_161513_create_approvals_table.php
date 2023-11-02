@@ -14,8 +14,8 @@ class CreateApprovalsTable extends Migration
     public function up()
     {
         Schema::create('approvals', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('modification_id');
+            $table->id();
+            $table->foreignId('modification_id')->constrained()->noActionOnDelete();
             $table->integer('approver_id');
             $table->string('approver_type');
             $table->text('reason')->nullable();

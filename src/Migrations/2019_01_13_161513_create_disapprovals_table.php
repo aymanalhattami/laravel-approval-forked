@@ -14,8 +14,8 @@ class CreateDisapprovalsTable extends Migration
     public function up()
     {
         Schema::create('disapprovals', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('modification_id');
+            $table->id();
+            $table->foreignId('modification_id')->constrained()->noActionOnDelete();
             $table->integer('disapprover_id');
             $table->string('disapprover_type');
             $table->text('reason')->nullable();
