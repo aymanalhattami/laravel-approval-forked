@@ -17,7 +17,7 @@ class CreateModificationRelationsTable extends Migration
             $table->id();
             $table->foreignId('modification_id')->constrained()->noActionOnDelete();
             $table->string('model');
-            $table->string('model_relation_column');
+            $table->string('model_foreign_id');
             $table->json('modifications');
             $table->timestamps();
             $table->softDeletes();

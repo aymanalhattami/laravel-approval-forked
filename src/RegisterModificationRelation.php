@@ -87,7 +87,7 @@ class RegisterModificationRelation
         $this->modificationRelation = ModificationRelation::create([
             'modification_id' => $this->getModification()->id,
             'model' => $this->getModel(),
-            'model_relation_column' => $this->getModelForeignId(),
+            'model_foreign_id' => $this->getModelForeignId(),
             'modifications' => $this->getModifiedData(),
         ]);
 

@@ -232,27 +232,9 @@ trait RequiresApproval
                     $modificationRelationModel->{$key} = $value['modified'];
                 }
 
-                $modificationRelationModel->{$modificationRelation->model_relation_column} = $this->id;
+                $modificationRelationModel->{$modificationRelation->model_foreign_id} = $this->id;
                 $modificationRelationModel->save();
             }
         }
-    }
-
-    public static function createModification(array $data): Modification
-    {
-        $modifiedData = [];
-
-        foreach ($data as $key => $value){
-            $modifiedData[$key] = ['modified' => $value, 'original' => null];
-        }
-
-        return Modification::create([
-            'modifiable_type' => static::class,
-            'modifier_id' => Auth::id(),
-            'modifier_type' => Auth::user()::class,
-            'is_update' => false,
-            'md5' => md5(static::class),
-            'modifications' => $modifiedData
-        ]);
     }
 }
