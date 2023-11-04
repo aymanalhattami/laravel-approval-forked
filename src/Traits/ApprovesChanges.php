@@ -2,6 +2,8 @@
 
 namespace Approval\Traits;
 
+use Approval\Models\Approval;
+
 trait ApprovesChanges
 {
     /**
@@ -44,18 +46,18 @@ trait ApprovesChanges
 
             // Prevent disapproving and approving
             if ($disapproval = $this->disapprovals()->where([
-                'disapprover_id'   => $this->{$this->primaryKey},
+                'disapprover_id' => $this->{$this->primaryKey},
                 'disapprover_type' => get_class(),
-                'modification_id'  => $modification->id,
+                'modification_id' => $modification->id,
             ])->first()) {
                 $disapproval->delete();
             }
 
             // Prevent duplicates
-            $approvalModel = config('approval.models.approval', \Approval\Models\Approval::class);
+            $approvalModel = config('approval.models.approval', Approval::class);
             $approvalModel::firstOrCreate([
-                'approver_id'     => $this->{$this->primaryKey},
-                'approver_type'   => get_class(),
+                'approver_id' => $this->{$this->primaryKey},
+                'approver_type' => get_class(),
                 'modification_id' => $modification->id,
                 'reason' => $reason
             ]);
@@ -131,7 +133,7 @@ trait ApprovesChanges
      */
     public function approvals()
     {
-        return $this->/* @scrutinizer ignore-call */morphMany(\Approval\Models\Approval::class, 'approver');
+        return $this->/* @scrutinizer ignore-call */ morphMany(Approval::class, 'approver');
     }
 
     /**

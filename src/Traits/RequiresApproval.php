@@ -2,8 +2,8 @@
 
 namespace Approval\Traits;
 
-use Approval\Models\Modification;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 trait RequiresApproval
 {
@@ -47,7 +47,7 @@ trait RequiresApproval
      *
      * @var bool
      */
-    protected $deleteWhenApproved = true;
+    protected $deleteWhenApproved = false;
 
     /**
      * Boolean to mark whether or not the approval model should be saved
@@ -83,7 +83,7 @@ trait RequiresApproval
      */
     protected function requiresApprovalWhen($modifications) : bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -124,20 +124,24 @@ trait RequiresApproval
     public function applyModificationChanges(\Approval\Models\Modification $modification, bool $approved)
     {
         if ($approved && $this->updateWhenApproved) {
-            $this->setForcedApprovalUpdate(true);
+            DB::transaction(function () use ($modification, $approved) {
+                $this->setForcedApprovalUpdate(true);
 
-            foreach ($modification->modifications as $key => $mod) {
-                $this->{$key} = $mod['modified'];
-            }
+                foreach ($modification->modifications as $key => $mod) {
+                    $this->{$key} = $mod['modified'];
+                }
 
-            $this->save();
+                $this->save();
 
-            if ($this->deleteWhenApproved) {
-                $modification->delete();
-            } else {
-                $modification->active = false;
-                $modification->save();
-            }
+                if ($this->deleteWhenApproved) {
+                    $modification->delete();
+                } else {
+                    $modification->active = false;
+                    $modification->save();
+                }
+
+                $this->saveModificationRelations($modification);
+            });
         } elseif ($approved === false) {
             if ($this->deleteWhenDisapproved) {
                 $modification->delete();
@@ -212,5 +216,22 @@ trait RequiresApproval
         }
 
         return false;
+    }
+
+    public function saveModificationRelations($modification)
+    {
+        if ($modification->modificationRelations()->exists()) {
+            foreach ($modification->modificationRelations as $modificationRelation) {
+                $modificationRelationModel = new $modificationRelation->model;
+                $modificationRelationModel->setForcedApprovalUpdate(true);
+
+                foreach ($modificationRelation->modifications as $key => $value) {
+                    $modificationRelationModel->{$key} = $value['modified'];
+                }
+
+                $modificationRelationModel->{$modificationRelation->model_relation_column} = $this->id;
+                $modificationRelationModel->save();
+            }
+        }
     }
 }
