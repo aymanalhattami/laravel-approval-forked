@@ -24,7 +24,7 @@ class Disapproval extends Model
     }
 
     /**
-     * Return Modification relation via direct relation.
+     * Return RegisterModification relation via direct relation.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */

@@ -90,7 +90,7 @@ trait RequiresApproval
     }
 
     /**
-     * Return Modification relations via moprhMany.
+     * Return RegisterModification relations via moprhMany.
      *
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
