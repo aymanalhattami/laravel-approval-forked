@@ -166,4 +166,21 @@ class Modification extends Model
     {
         return $query->where('is_update', false);
     }
+
+    public function createModificationRelation(array $data): ModificationRelation
+    {
+        $modifiedData = [];
+
+        foreach ($data['modifications'] as $key => $value){
+            $modifiedData[$key] = ['modified' => $value, 'original' => null];
+        }
+
+        return ModificationRelation::create([
+            'modification_id' => $this->id,
+            'model' => $data['model'],
+            'model_relation_column' => $data['model_relation_column'],
+            'modifications' => $modifiedData,
+
+        ]);
+    }
 }

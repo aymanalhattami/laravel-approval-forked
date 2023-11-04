@@ -3,6 +3,7 @@
 namespace Approval\Traits;
 
 use Approval\Models\Modification;
+use Approval\Models\ModificationRelation;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
