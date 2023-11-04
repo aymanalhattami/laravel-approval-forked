@@ -2,7 +2,9 @@
 
 namespace Approval\Traits;
 
+use Approval\Models\Modification;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 trait RequiresApproval
@@ -233,5 +235,23 @@ trait RequiresApproval
                 $modificationRelationModel->save();
             }
         }
+    }
+
+    public static function createModification(array $data): Modification
+    {
+        $modifiedData = [];
+
+        foreach ($data as $key => $value){
+            $modifiedData[$key] = ['modified' => $value, 'original' => null];
+        }
+
+        return Modification::create([
+            'modifiable_type' => static::class,
+            'modifier_id' => Auth::id(),
+            'modifier_type' => Auth::user()::class,
+            'is_update' => false,
+            'md5' => md5(static::class),
+            'modifications' => $modifiedData
+        ]);
     }
 }
