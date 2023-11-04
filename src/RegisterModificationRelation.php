@@ -59,7 +59,7 @@ class RegisterModificationRelation
         return $this->modelForeignId;
     }
 
-    public function setData(array $data): self
+    public function setData(array $data = []): self
     {
         $this->data = $data;
 
