@@ -17,11 +17,19 @@ class RegisterModification implements \Approval\Contracts\HasMedia
     protected string $modelName;
     protected array $data = [];
     protected Modification $modification;
+    protected bool $isUpdate = false;
 
 
     public static function make(): self
     {
         return new static;
+    }
+
+    public function isUpdate(bool $value = true): self
+    {
+        $this->isUpdate = $value;
+
+        return $this;
     }
 
     public function setModification(Modification $modification): self
@@ -82,7 +90,7 @@ class RegisterModification implements \Approval\Contracts\HasMedia
             'modifiable_type' => $this->getModelName(),
             'modifier_id' => Auth::id(),
             'modifier_type' => Auth::user()::class,
-            'is_update' => false,
+            'is_update' => $this->isUpdate,
             'md5' => md5(Carbon::now()->format('Y-m-d-H-i-s')),
             'modifications' => $this->getModifiedData()
         ]);
