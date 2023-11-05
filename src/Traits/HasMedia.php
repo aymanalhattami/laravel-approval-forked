@@ -77,28 +77,28 @@ trait HasMedia
         return $this->disk;
     }
 
-    public function setApprovalDirectory(string $directory): self
+    public function setApprovalDirectory(string $approvalDirectory): self
     {
-        $this->directory = $directory;
+        $this->approvalDirectory = $approvalDirectory;
 
         return $this;
     }
 
     public function getApprovalDirectory(): string
     {
-        return $this->directory;
+        return $this->approvalDirectory;
     }
 
-    public function setApprovalMediaCollection(string $mediaCollection): self
+    public function setApprovalMediaCollection(string $approvalMediaCollection): self
     {
-        $this->mediaCollection = $mediaCollection;
+        $this->approvalMediaCollection = $approvalMediaCollection;
 
         return $this;
     }
 
     public function getApprovalMediaCollection(): string
     {
-        return $this->mediaCollection;
+        return $this->approvalMediaCollection;
     }
 
     /**
@@ -116,7 +116,7 @@ trait HasMedia
                     'approval_collection_name' => $this->getApprovalMediaCollection()
                 ])
                 ->usingName($file->getClientOriginalName())
-                ->toMediaCollection($this->getMediaCollection());
+                ->toMediaCollection($this->getMediaCollection(), $this->getDisk());
         }
 
         return $this;
