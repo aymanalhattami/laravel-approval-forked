@@ -237,7 +237,7 @@ trait RequiresApproval
                 $modificationRelationModel->save();
 
                 // save media
-                $this->saveModificationRelationMedia($modificationRelation);
+                $this->saveModificationRelationMedia($modificationRelation, $modificationRelationModel);
             }
         }
     }
@@ -267,7 +267,7 @@ trait RequiresApproval
         }
     }
 
-    public function saveModificationRelationMedia(ModificationRelation $modificationRelation)
+    public function saveModificationRelationMedia(ModificationRelation $modificationRelation, $model)
     {
         if($modificationRelation->media()->exists()){
             foreach ($modificationRelation->media as $media){
@@ -287,7 +287,7 @@ trait RequiresApproval
                     $collectionName = $media->getCustomProperty('approval_collection_name');
                 }
 
-                $media->copy($this, $collectionName, $disk);
+                $media->copy($model, $collectionName, $disk);
             }
         }
     }
