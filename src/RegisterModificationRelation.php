@@ -4,9 +4,12 @@ namespace Approval;
 
 use Approval\Models\Modification;
 use Approval\Models\ModificationRelation;
+use Approval\Traits\HasMedia;
 
 class RegisterModificationRelation
 {
+    use HasMedia;
+
     protected string $model;
     protected array $data = [];
     protected Modification $modification;

@@ -21,4 +21,6 @@ return [
       'modificationRelation'  => \Approval\Models\ModificationRelation::class,
     ],
 
+    'disk_name' => env('MODIFICATION_DISK_NAME', 'public'),
+    'collection_name' => env('MODIFICATION_COLLECTION_NAME', 'modification')
 ];
