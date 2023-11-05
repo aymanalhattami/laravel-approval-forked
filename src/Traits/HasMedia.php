@@ -15,7 +15,7 @@ trait HasMedia
 
     protected string $approvalDisk = 'public';
     protected string $approvalDirectory = '';
-    protected string $approvalMediaCollection = 'approval';
+    protected string $approvalMediaCollectionName = 'approval';
 
     public function setFiles(array $media): self
     {
@@ -89,16 +89,16 @@ trait HasMedia
         return $this->approvalDirectory;
     }
 
-    public function setApprovalMediaCollection(string $approvalMediaCollection): self
+    public function setApprovalMediaCollectionName(string $approvalMediaCollectionName): self
     {
-        $this->approvalMediaCollection = $approvalMediaCollection;
+        $this->approvalMediaCollectionName = $approvalMediaCollectionName;
 
         return $this;
     }
 
-    public function getApprovalMediaCollection(): string
+    public function getApprovalMediaCollectionName(): string
     {
-        return $this->approvalMediaCollection;
+        return $this->approvalMediaCollectionName;
     }
 
     /**
@@ -113,7 +113,7 @@ trait HasMedia
                 ->withCustomProperties([
                     'approval_disk' => $this->getApprovalDisk(),
                     'approval_directory' => $this->getApprovalDirectory(),
-                    'approval_collection_name' => $this->getApprovalMediaCollection()
+                    'approval_collection_name' => $this->getApprovalMediaCollectionName()
                 ])
                 ->usingName($file->getClientOriginalName())
                 ->toMediaCollection($this->getMediaCollection(), $this->getDisk());
