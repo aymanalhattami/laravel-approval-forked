@@ -143,6 +143,7 @@ trait RequiresApproval
                     $modification->save();
                 }
 
+                $this->saveModificationMedia($modification);
                 $this->saveModificationRelations($modification);
             });
         } elseif ($approved === false) {
@@ -234,6 +235,59 @@ trait RequiresApproval
 
                 $modificationRelationModel->{$modificationRelation->model_foreign_id} = $this->id;
                 $modificationRelationModel->save();
+
+                // save media
+                $this->saveModificationRelationMedia($modificationRelation);
+            }
+        }
+    }
+
+    public function saveModificationMedia(Modification $modification)
+    {
+        if($modification->media()->exists()){
+            foreach ($modification->media as $media){
+                $disk = null;
+                $directory = null;
+                $collectionName = null;
+
+                if($media->hasCustomProperty('approval_disk')){
+                    $disk = $media->getCustomProperty('approval_disk');
+                }
+
+                if($media->hasCustomProperty('approval_directory')){
+                    $directory = $media->getCustomProperty('approval_directory');
+                }
+
+                if($media->hasCustomProperty('approval_collection_name')){
+                    $collectionName = $media->getCustomProperty('approval_collection_name');
+                }
+
+                $media->copy($this, $collectionName, $disk);
+            }
+        }
+    }
+
+    public function saveModificationRelationMedia(ModificationRelation $modificationRelation)
+    {
+        if($modificationRelation->media()->exists()){
+            foreach ($modificationRelation->media as $media){
+                $disk = null;
+                $directory = null;
+                $collectionName = null;
+
+                if($media->hasCustomProperty('approval_disk')){
+                    $disk = $media->getCustomProperty('approval_disk');
+                }
+
+                if($media->hasCustomProperty('approval_directory')){
+                    $directory = $media->getCustomProperty('approval_directory');
+                }
+
+                if($media->hasCustomProperty('approval_collection_name')){
+                    $collectionName = $media->getCustomProperty('approval_collection_name');
+                }
+
+                $media->copy($this, $collectionName, $disk);
             }
         }
     }
