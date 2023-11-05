@@ -5,12 +5,13 @@ namespace Approval;
 use Approval\Models\Modification;
 use Approval\Models\ModificationRelation;
 use Approval\Traits\HasMedia;
+use Illuminate\Database\Eloquent\Model;
 
-class RegisterModificationRelation
+class RegisterModificationRelation implements \Approval\Contracts\HasMedia
 {
     use HasMedia;
 
-    protected string $model;
+    protected string $modelName;
     protected array $data = [];
     protected Modification $modification;
     protected ModificationRelation $modificationRelation;
@@ -33,21 +34,28 @@ class RegisterModificationRelation
         return $this->modification;
     }
 
+    public function setModificationRelation(ModificationRelation $modificationRelation): self
+    {
+        $this->modificationRelation = $modificationRelation;
+
+        return $this;
+    }
+
     public function getModificationRelation(): ModificationRelation
     {
         return $this->modificationRelation;
     }
 
-    public function setModel(string $model): self
+    public function setModelName(string $modelName): self
     {
-        $this->model = $model;
+        $this->modelName = $modelName;
 
         return $this;
     }
 
-    public function getModel(): string
+    public function getModelName(): string
     {
-        return $this->model;
+        return $this->modelName;
     }
 
     public function setModelForeignId(string $modelForeignId): static
@@ -85,11 +93,16 @@ class RegisterModificationRelation
         return $modifiedData;
     }
 
-    public function create():self
+    public function getMediaModel(): ModificationRelation
+    {
+        return $this->modificationRelation;
+    }
+
+    public function save():self
     {
         $this->modificationRelation = ModificationRelation::create([
             'modification_id' => $this->getModification()->id,
-            'model' => $this->getModel(),
+            'model' => $this->getModelName(),
             'model_foreign_id' => $this->getModelForeignId(),
             'modifications' => $this->getModifiedData(),
         ]);

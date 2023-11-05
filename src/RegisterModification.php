@@ -4,17 +4,18 @@ namespace Approval;
 
 use Approval\Models\Modification;
 use Approval\Traits\HasMedia;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
-class RegisterModification
+class RegisterModification implements \Approval\Contracts\HasMedia
 {
     use HasMedia;
 
-    protected string $model;
+    protected string $modelName;
     protected array $data = [];
-    protected array $media = [];
     protected Modification $modification;
 
 
@@ -35,16 +36,16 @@ class RegisterModification
         return $this->modification;
     }
 
-    public function setModel(string $model): self
+    public function setModelName(string $modelName): self
     {
-        $this->model = $model;
+        $this->modelName = $modelName;
 
         return $this;
     }
 
-    public function getModel(): string
+    public function getModelName(): string
     {
-        return $this->model;
+        return $this->modelName;
     }
 
     public function setData(array $data = []): self
@@ -70,14 +71,19 @@ class RegisterModification
         return $modifiedData;
     }
 
-    public function create():self
+    public function getMediaModel(): Modification
+    {
+        return $this->modification;
+    }
+
+    public function save():self
     {
         $this->modification = Modification::create([
-            'modifiable_type' => $this->getModel(),
+            'modifiable_type' => $this->getModelName(),
             'modifier_id' => Auth::id(),
             'modifier_type' => Auth::user()::class,
             'is_update' => false,
-            'md5' => md5($this->getModel()),
+            'md5' => md5(Carbon::now()->format('Y-m-d-H-i-s')),
             'modifications' => $this->getModifiedData()
         ]);
 

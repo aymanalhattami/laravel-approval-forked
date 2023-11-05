@@ -7,6 +7,8 @@ use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
 trait HasMedia
 {
+    protected array $files = [];
+
     protected string $disk = 'public';
     protected string $directory = '';
     protected string $mediaCollection = 'modification';
@@ -15,16 +17,16 @@ trait HasMedia
     protected string $approvalDirectory = '';
     protected string $approvalMediaCollection = 'approval';
 
-    public function setMedia(array $media): self
+    public function setFiles(array $media): self
     {
-        $this->media = $media;
+        $this->files = $media;
 
         return $this;
     }
 
-    public function getMedia(): array
+    public function getFiles(): array
     {
-        return $this->media;
+        return $this->files;
     }
 
     public function setDisk(string $disk): self
@@ -103,10 +105,10 @@ trait HasMedia
      * @throws FileDoesNotExist
      * @throws FileIsTooBig
      */
-    public function createMedia(): self
+    public function saveFiles(): self
     {
-        foreach ($this->getMedia() as $key => $file){
-            $this->getModification()
+        foreach ($this->getFiles() as $key => $file){
+            $this->getMediaModel()
                 ->addMedia($file->getRealPath())
                 ->withCustomProperties([
                     'approval_disk' => $this->getApprovalDisk(),
