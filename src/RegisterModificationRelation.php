@@ -2,11 +2,10 @@
 
 namespace Approval;
 
+use Approval\Enums\ActionEnum;
 use Approval\Models\Modification;
 use Approval\Models\ModificationRelation;
 use Approval\Traits\HasMedia;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class RegisterModificationRelation implements \Approval\Contracts\HasMedia
 {
@@ -17,21 +16,47 @@ class RegisterModificationRelation implements \Approval\Contracts\HasMedia
     protected Modification $modification;
     protected ModificationRelation $modificationRelation;
     protected string $modelForeignId;
-    protected string $relationType = HasMany::class;
+    protected ActionEnum $action = ActionEnum::Create;
+    protected string|null $modelTypeColumn = null;
+    protected string|null $modelIdColumn = null;
 
     public static function make(): self
     {
         return new static;
     }
 
-    public function getRelationType(): string
+    public function getModelTypeColumn(): ?string
     {
-        return $this->relationType;
+        return $this->modelTypeColumn;
     }
 
-    public function setRelationType(string $relationType): self
+    public function setModelTypeColumn(?string $modelTypeColumn): static
     {
-        $this->relationType = $relationType;
+        $this->modelTypeColumn = $modelTypeColumn;
+
+        return $this;
+    }
+
+    public function getModelIdColumn(): ?string
+    {
+        return $this->modelIdColumn;
+    }
+
+    public function setModelIdColumn(?string $modelIdColumn): static
+    {
+        $this->modelIdColumn = $modelIdColumn;
+
+        return $this;
+    }
+
+    public function getAction(): ActionEnum
+    {
+        return $this->action;
+    }
+
+    public function setAction(ActionEnum $action): self
+    {
+        $this->action = $action;
 
         return $this;
     }
@@ -119,7 +144,9 @@ class RegisterModificationRelation implements \Approval\Contracts\HasMedia
             'model' => $this->getModelName(),
             'model_foreign_id' => $this->getModelForeignId(),
             'modifications' => $this->getModifiedData(),
-            'relation_type' => $this->getRelationType()
+            'action' => $this->getAction()->value,
+            'model_type_column' => $this->getModelTypeColumn(),
+            'model_id_column' => $this->getModelIdColumn()
         ]);
 
         return $this;

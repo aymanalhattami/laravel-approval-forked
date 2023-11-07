@@ -16,7 +16,7 @@ class RegisterModification implements \Approval\Contracts\HasMedia
     use HasMedia;
 
     protected string $modelName;
-    protected string $modelId;
+    protected string|null $modelId = null;
     protected array $data = [];
     protected Modification $modification;
     protected bool $isUpdate = false;
@@ -33,7 +33,7 @@ class RegisterModification implements \Approval\Contracts\HasMedia
         return $this;
     }
 
-    public function getModelId(): string
+    public function getModelId(): string|null
     {
         return $this->modelId;
     }
@@ -44,13 +44,6 @@ class RegisterModification implements \Approval\Contracts\HasMedia
 
         return $this;
     }
-
-//    public function setModification(Modification $modification): self
-//    {
-//        $this->modification = $modification;
-//
-//        return $this;
-//    }
 
     public function getModification(): Modification
     {

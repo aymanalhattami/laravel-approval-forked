@@ -19,7 +19,9 @@ class CreateModificationRelationsTable extends Migration
             $table->string('model');
             $table->string('model_foreign_id');
             $table->json('modifications');
-            $table->string('relation_type');
+            $table->string('action');
+            $table->string('model_type_column')->nullable();
+            $table->string('model_id_column')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
