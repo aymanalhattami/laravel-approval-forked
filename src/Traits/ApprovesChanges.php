@@ -3,6 +3,7 @@
 namespace Approval\Traits;
 
 use Approval\Models\Approval;
+use Illuminate\Support\Facades\DB;
 
 trait ApprovesChanges
 {
@@ -43,35 +44,36 @@ trait ApprovesChanges
     public function approve(\Approval\Models\Modification $modification, ?string $reason = null): bool
     {
         if ($this->authorizedToApprove($modification)) {
-
-            // Prevent disapproving and approving
-            if ($disapproval = $this->disapprovals()->where([
-                'disapprover_id' => $this->{$this->primaryKey},
-                'disapprover_type' => get_class(),
-                'modification_id' => $modification->id,
-            ])->first()) {
-                $disapproval->delete();
-            }
-
-            // Prevent duplicates
-            $approvalModel = config('approval.models.approval', Approval::class);
-            $approvalModel::firstOrCreate([
-                'approver_id' => $this->{$this->primaryKey},
-                'approver_type' => get_class(),
-                'modification_id' => $modification->id,
-                'reason' => $reason
-            ]);
-
-            $modification->fresh();
-
-            if ($modification->approversRemaining == 0) {
-                if ($modification->modifiable_id === null) {
-                    $polymorphicModel = new $modification->modifiable_type();
-                    $polymorphicModel->applyModificationChanges($modification, true);
-                } else {
-                    $modification->modifiable->applyModificationChanges($modification, true);
+            DB::transaction(function() use ($modification, $reason) {
+                // Prevent disapproving and approving
+                if ($disapproval = $this->disapprovals()->where([
+                    'disapprover_id' => $this->{$this->primaryKey},
+                    'disapprover_type' => get_class(),
+                    'modification_id' => $modification->id,
+                ])->first()) {
+                    $disapproval->delete();
                 }
-            }
+
+                // Prevent duplicates
+                $approvalModel = config('approval.models.approval', Approval::class);
+                $approvalModel::firstOrCreate([
+                    'approver_id' => $this->{$this->primaryKey},
+                    'approver_type' => get_class(),
+                    'modification_id' => $modification->id,
+                    'reason' => $reason
+                ]);
+
+                $modification->fresh();
+
+                if ($modification->approversRemaining == 0) {
+                    if ($modification->modifiable_id === null) {
+                        $polymorphicModel = new $modification->modifiable_type();
+                        $polymorphicModel->applyModificationChanges($modification, true);
+                    } else {
+                        $modification->modifiable->applyModificationChanges($modification, true);
+                    }
+                }
+            });
 
             return true;
         }
