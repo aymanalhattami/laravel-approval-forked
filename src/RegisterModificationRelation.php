@@ -6,6 +6,7 @@ use Approval\Models\Modification;
 use Approval\Models\ModificationRelation;
 use Approval\Traits\HasMedia;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class RegisterModificationRelation implements \Approval\Contracts\HasMedia
 {
@@ -16,10 +17,23 @@ class RegisterModificationRelation implements \Approval\Contracts\HasMedia
     protected Modification $modification;
     protected ModificationRelation $modificationRelation;
     protected string $modelForeignId;
+    protected string $relationType = HasMany::class;
 
     public static function make(): self
     {
         return new static;
+    }
+
+    public function getRelationType(): string
+    {
+        return $this->relationType;
+    }
+
+    public function setRelationType(string $relationType): self
+    {
+        $this->relationType = $relationType;
+
+        return $this;
     }
 
     public function setModification(Modification $modification): static
@@ -105,6 +119,7 @@ class RegisterModificationRelation implements \Approval\Contracts\HasMedia
             'model' => $this->getModelName(),
             'model_foreign_id' => $this->getModelForeignId(),
             'modifications' => $this->getModifiedData(),
+            'relation_type' => $this->getRelationType()
         ]);
 
         return $this;

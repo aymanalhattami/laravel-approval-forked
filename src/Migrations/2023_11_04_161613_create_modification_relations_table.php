@@ -19,6 +19,7 @@ class CreateModificationRelationsTable extends Migration
             $table->string('model');
             $table->string('model_foreign_id');
             $table->json('modifications');
+            $table->string('relation_type');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -31,6 +32,6 @@ class CreateModificationRelationsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('modifications');
+        Schema::dropIfExists('modification_relations');
     }
 }
