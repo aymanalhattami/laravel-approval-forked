@@ -2,29 +2,44 @@
 
 namespace Approval\Traits;
 
+use Approval\Enums\MediaActionEnum;
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
 trait HasMedia
 {
-    protected array $files = [];
-    protected Model $model;
+    private array|Closure $files = [];
+    private Model $model;
 
-    protected string $disk = 'public';
-    protected string $directory = '';
-    protected string $mediaCollectionName = 'modification';
+    private string $disk = 'public';
+    private string $directory = '';
+    private string $mediaCollectionName = 'modification';
 
-    protected string $approvalDisk = 'public';
-    protected string $approvalDirectory = '';
-    protected string $approvalMediaCollectionName = 'approval';
+    private string $approvalDisk = 'public';
+    private string $approvalDirectory = '';
+    private string $approvalMediaCollectionName = 'approval';
+    private MediaActionEnum $action = MediaActionEnum::Create;
 
     public static function make(): static
     {
         return new static;
     }
 
-    public function getModel(): Model
+    private function getAction(): MediaActionEnum
+    {
+        return $this->action;
+    }
+
+    public function setAction(MediaActionEnum $action): static
+    {
+        $this->action = $action;
+
+        return $this;
+    }
+
+    private function getModel(): Model
     {
         return $this->model;
     }
@@ -36,16 +51,16 @@ trait HasMedia
         return $this;
     }
 
-    public function setFiles(array $media): static
+    public function setFiles(Closure|array $files): static
     {
-        $this->files = $media;
+        $this->files = $files;
 
         return $this;
     }
 
-    public function getFiles(): array
+    private function getFiles(): array
     {
-        return $this->files;
+        return $this->files instanceof Closure ? ($this->files)() : $this->files;
     }
 
     public function setDisk(string $disk): static
@@ -55,7 +70,7 @@ trait HasMedia
         return $this;
     }
 
-    public function getDisk(): string
+    private function getDisk(): string
     {
         return $this->disk;
     }
@@ -67,7 +82,7 @@ trait HasMedia
         return $this;
     }
 
-    public function getDirectory(): string
+    private function getDirectory(): string
     {
         return $this->directory;
     }
@@ -79,7 +94,7 @@ trait HasMedia
         return $this;
     }
 
-    public function getMediaCollectionName(): string
+    private function getMediaCollectionName(): string
     {
         return $this->mediaCollectionName;
     }
@@ -91,7 +106,7 @@ trait HasMedia
         return $this;
     }
 
-    public function getApprovalDisk(): string
+    private function getApprovalDisk(): string
     {
         return $this->disk;
     }
@@ -103,7 +118,7 @@ trait HasMedia
         return $this;
     }
 
-    public function getApprovalDirectory(): string
+    private function getApprovalDirectory(): string
     {
         return $this->approvalDirectory;
     }
@@ -115,7 +130,7 @@ trait HasMedia
         return $this;
     }
 
-    public function getApprovalMediaCollectionName(): string
+    private function getApprovalMediaCollectionName(): string
     {
         return $this->approvalMediaCollectionName;
     }
@@ -124,7 +139,7 @@ trait HasMedia
      * @throws FileDoesNotExist
      * @throws FileIsTooBig
      */
-    public function saveFiles(): static
+    public function save(): static
     {
         foreach ($this->getFiles() as $key => $file){
             $this->getModel()
@@ -132,7 +147,8 @@ trait HasMedia
                 ->withCustomProperties([
                     'approval_disk' => $this->getApprovalDisk(),
                     'approval_directory' => $this->getApprovalDirectory(),
-                    'approval_collection_name' => $this->getApprovalMediaCollectionName()
+                    'approval_collection_name' => $this->getApprovalMediaCollectionName(),
+                    'action' => $this->getAction()->value
                 ])
                 ->usingName($file->getClientOriginalName())
                 ->toMediaCollection($this->getMediaCollectionName(), $this->getDisk());

@@ -13,15 +13,23 @@ use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
 class RegisterModification
 {
-    protected string $modelName;
-    protected string|null $modelId = null;
-    protected array $data = [];
-    protected Modification $modification;
-    protected bool $isUpdate = false;
+    private string $modelName;
+    private string|null $modelId = null;
+    private array $data = [];
+    private Modification $modification;
+    private bool $isUpdate = false;
 
     public static function make(): self
     {
         return new static;
+    }
+
+    public function setModel(Model $model): static
+    {
+        $this->modelName = $model::class;
+        $this->modelId = $model->id;
+
+        return $this;
     }
 
     public function isUpdate(bool $value = true): self
@@ -31,7 +39,7 @@ class RegisterModification
         return $this;
     }
 
-    public function getModelId(): string|null
+    private function getModelId(): string|null
     {
         return $this->modelId;
     }
@@ -55,7 +63,7 @@ class RegisterModification
         return $this;
     }
 
-    public function getModelName(): string
+    private function getModelName(): string
     {
         return $this->modelName;
     }
@@ -67,12 +75,12 @@ class RegisterModification
         return $this;
     }
 
-    public function getData(): array
+    private function getData(): array
     {
         return $this->data;
     }
 
-    public function getModifiedData(): array
+    private function getModifiedData(): array
     {
         $modifiedData = [];
 

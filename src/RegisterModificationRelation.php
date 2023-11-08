@@ -5,27 +5,24 @@ namespace Approval;
 use Approval\Enums\ActionEnum;
 use Approval\Models\Modification;
 use Approval\Models\ModificationRelation;
-use Approval\Traits\HasMedia;
 
 class RegisterModificationRelation
 {
-    use HasMedia;
-
-    protected string $modelName;
-    protected array $data = [];
-    protected Modification $modification;
-    protected ModificationRelation $modificationRelation;
-    protected string $foreignIdColumn;
-    protected ActionEnum $action = ActionEnum::Create;
-    protected string|null $modelTypeColumn = null;
-    protected string|null $modelIdColumn = null;
+    private string $modelName;
+    private array $data = [];
+    private Modification $modification;
+    private ModificationRelation $modificationRelation;
+    private string $foreignIdColumn;
+    private ActionEnum $action = ActionEnum::Create;
+    private string|null $modelTypeColumn = null;
+//    protected string|null $modelIdColumn = null;
 
     public static function make(): self
     {
         return new static;
     }
 
-    public function getModelTypeColumn(): ?string
+    private function getModelTypeColumn(): ?string
     {
         return $this->modelTypeColumn;
     }
@@ -37,19 +34,19 @@ class RegisterModificationRelation
         return $this;
     }
 
-    public function getModelIdColumn(): ?string
-    {
-        return $this->modelIdColumn;
-    }
+//    private function getModelIdColumn(): ?string
+//    {
+//        return $this->modelIdColumn;
+//    }
+//
+//    public function setModelIdColumn(?string $modelIdColumn): static
+//    {
+//        $this->modelIdColumn = $modelIdColumn;
+//
+//        return $this;
+//    }
 
-    public function setModelIdColumn(?string $modelIdColumn): static
-    {
-        $this->modelIdColumn = $modelIdColumn;
-
-        return $this;
-    }
-
-    public function getAction(): ActionEnum
+    private function getAction(): ActionEnum
     {
         return $this->action;
     }
@@ -68,17 +65,17 @@ class RegisterModificationRelation
         return $this;
     }
 
-    public function getModification(): Modification
+    private function getModification(): Modification
     {
         return $this->modification;
     }
 
-    public function setModificationRelation(ModificationRelation $modificationRelation): self
-    {
-        $this->modificationRelation = $modificationRelation;
-
-        return $this;
-    }
+//    public function setModificationRelation(ModificationRelation $modificationRelation): self
+//    {
+//        $this->modificationRelation = $modificationRelation;
+//
+//        return $this;
+//    }
 
     public function getModificationRelation(): ModificationRelation
     {
@@ -92,7 +89,7 @@ class RegisterModificationRelation
         return $this;
     }
 
-    public function getModelName(): string
+    private function getModelName(): string
     {
         return $this->modelName;
     }
@@ -104,7 +101,7 @@ class RegisterModificationRelation
         return $this;
     }
 
-    public function getForeignIdColumn(): string
+    private function getForeignIdColumn(): string
     {
         return $this->foreignIdColumn;
     }
@@ -116,12 +113,12 @@ class RegisterModificationRelation
         return $this;
     }
 
-    public function getData(): array
+    private function getData(): array
     {
         return $this->data;
     }
 
-    public function getModifiedData(): array
+    private function getModifiedData(): array
     {
         $modifiedData = [];
 

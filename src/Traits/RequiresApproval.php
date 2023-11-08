@@ -224,7 +224,7 @@ trait RequiresApproval
         }
     }
 
-    public function saveModificationMedia(Modification $modification)
+    public function saveModificationMedia(Modification $modification): void
     {
         if ($modification->media()->exists()) {
             foreach ($modification->media as $media) {

@@ -2,6 +2,7 @@
 
 namespace Approval\Enums;
 
+# TODO:: rename to RelationAction
 enum ActionEnum: string
 {
     case Create = 'create'; # useful for hasMany or belongsToMany relationship
