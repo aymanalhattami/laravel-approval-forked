@@ -7,7 +7,7 @@ use Approval\Models\Modification;
 use Approval\Models\ModificationRelation;
 use Approval\Traits\HasMedia;
 
-class RegisterModificationRelation implements \Approval\Contracts\HasMedia
+class RegisterModificationRelation
 {
     use HasMedia;
 
@@ -130,11 +130,6 @@ class RegisterModificationRelation implements \Approval\Contracts\HasMedia
         }
 
         return $modifiedData;
-    }
-
-    public function getMediaModel(): ModificationRelation
-    {
-        return $this->modificationRelation;
     }
 
     public function save():self

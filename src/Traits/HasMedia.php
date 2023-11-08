@@ -2,12 +2,14 @@
 
 namespace Approval\Traits;
 
+use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
 trait HasMedia
 {
     protected array $files = [];
+    protected Model $model;
 
     protected string $disk = 'public';
     protected string $directory = '';
@@ -17,7 +19,24 @@ trait HasMedia
     protected string $approvalDirectory = '';
     protected string $approvalMediaCollectionName = 'approval';
 
-    public function setFiles(array $media): self
+    public static function make(): static
+    {
+        return new static;
+    }
+
+    public function getModel(): Model
+    {
+        return $this->model;
+    }
+
+    public function setModel(Model $model): static
+    {
+        $this->model = $model;
+
+        return $this;
+    }
+
+    public function setFiles(array $media): static
     {
         $this->files = $media;
 
@@ -29,7 +48,7 @@ trait HasMedia
         return $this->files;
     }
 
-    public function setDisk(string $disk): self
+    public function setDisk(string $disk): static
     {
         $this->disk = $disk;
 
@@ -53,7 +72,7 @@ trait HasMedia
         return $this->directory;
     }
 
-    public function setMediaCollectionName(string $mediaCollectionName): self
+    public function setMediaCollectionName(string $mediaCollectionName): static
     {
         $this->mediaCollectionName = $mediaCollectionName;
 
@@ -65,7 +84,7 @@ trait HasMedia
         return $this->mediaCollectionName;
     }
 
-    public function setApprovalDisk(string $disk): self
+    public function setApprovalDisk(string $disk): static
     {
         $this->disk = $disk;
 
@@ -77,7 +96,7 @@ trait HasMedia
         return $this->disk;
     }
 
-    public function setApprovalDirectory(string $approvalDirectory): self
+    public function setApprovalDirectory(string $approvalDirectory): static
     {
         $this->approvalDirectory = $approvalDirectory;
 
@@ -89,7 +108,7 @@ trait HasMedia
         return $this->approvalDirectory;
     }
 
-    public function setApprovalMediaCollectionName(string $approvalMediaCollectionName): self
+    public function setApprovalMediaCollectionName(string $approvalMediaCollectionName): static
     {
         $this->approvalMediaCollectionName = $approvalMediaCollectionName;
 
@@ -105,10 +124,10 @@ trait HasMedia
      * @throws FileDoesNotExist
      * @throws FileIsTooBig
      */
-    public function saveFiles(): self
+    public function saveFiles(): static
     {
         foreach ($this->getFiles() as $key => $file){
-            $this->getMediaModel()
+            $this->getModel()
                 ->addMedia($file->getRealPath())
                 ->withCustomProperties([
                     'approval_disk' => $this->getApprovalDisk(),

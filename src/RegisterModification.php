@@ -11,10 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
-class RegisterModification implements \Approval\Contracts\HasMedia
+class RegisterModification
 {
-    use HasMedia;
-
     protected string $modelName;
     protected string|null $modelId = null;
     protected array $data = [];
@@ -85,11 +83,6 @@ class RegisterModification implements \Approval\Contracts\HasMedia
         }
 
         return $modifiedData;
-    }
-
-    public function getMediaModel(): Modification
-    {
-        return $this->modification;
     }
 
     public function save():self
