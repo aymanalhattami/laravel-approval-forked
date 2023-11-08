@@ -17,7 +17,7 @@ class RegisterModificationRelation
     protected ModificationRelation $modificationRelation;
     protected string $foreignIdColumn;
     protected ActionEnum $action = ActionEnum::Create;
-    protected string|null $morphModelTypeColumn = null;
+    protected string|null $modelTypeColumn = null;
     protected string|null $modelIdColumn = null;
 
     public static function make(): self
@@ -25,14 +25,14 @@ class RegisterModificationRelation
         return new static;
     }
 
-    public function getMorphModelTypeColumn(): ?string
+    public function getModelTypeColumn(): ?string
     {
-        return $this->morphModelTypeColumn;
+        return $this->modelTypeColumn;
     }
 
-    public function setMorphModelTypeColumn(?string $morphModelTypeColumn): static
+    public function setModelTypeColumn(?string $modelTypeColumn): static
     {
-        $this->morphModelTypeColumn = $morphModelTypeColumn;
+        $this->modelTypeColumn = $modelTypeColumn;
 
         return $this;
     }
@@ -140,8 +140,7 @@ class RegisterModificationRelation
             'foreign_id_column' => $this->getForeignIdColumn(),
             'modifications' => $this->getModifiedData(),
             'action' => $this->getAction()->value,
-            'morph_model_type_column' => $this->getMorphModelTypeColumn(),
-//            'model_id_column' => $this->getModelIdColumn()
+            'model_type_column' => $this->getModelTypeColumn(),
         ]);
 
         return $this;

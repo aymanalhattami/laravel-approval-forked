@@ -399,7 +399,7 @@ trait RequiresApproval
     {
         $modificationRelations->each(function ($modificationRelation) {
             $modificationRelation->model::where([
-                $modificationRelation->morph_model_type_column => static::class,
+                $modificationRelation->model_type_column => static::class,
                 $modificationRelation->foreign_id_column => $this->id
             ])->delete();
         });

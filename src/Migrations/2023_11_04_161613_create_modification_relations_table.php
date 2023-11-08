@@ -20,7 +20,7 @@ class CreateModificationRelationsTable extends Migration
             $table->string('foreign_id_column');
             $table->json('modifications');
             $table->string('action');
-            $table->string('morph_model_type_column')->nullable();
+            $table->string('model_type_column')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
