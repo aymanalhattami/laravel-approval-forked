@@ -17,11 +17,10 @@ class CreateModificationRelationsTable extends Migration
             $table->id();
             $table->foreignId('modification_id')->constrained()->noActionOnDelete();
             $table->string('model');
-            $table->string('model_foreign_id');
+            $table->string('foreign_id_column');
             $table->json('modifications');
             $table->string('action');
-            $table->string('model_type_column')->nullable();
-            $table->string('model_id_column')->nullable();
+            $table->string('morph_model_type_column')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

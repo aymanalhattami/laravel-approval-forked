@@ -15,9 +15,9 @@ class RegisterModificationRelation implements \Approval\Contracts\HasMedia
     protected array $data = [];
     protected Modification $modification;
     protected ModificationRelation $modificationRelation;
-    protected string $modelForeignId;
+    protected string $foreignIdColumn;
     protected ActionEnum $action = ActionEnum::Create;
-    protected string|null $modelTypeColumn = null;
+    protected string|null $morphModelTypeColumn = null;
     protected string|null $modelIdColumn = null;
 
     public static function make(): self
@@ -25,14 +25,14 @@ class RegisterModificationRelation implements \Approval\Contracts\HasMedia
         return new static;
     }
 
-    public function getModelTypeColumn(): ?string
+    public function getMorphModelTypeColumn(): ?string
     {
-        return $this->modelTypeColumn;
+        return $this->morphModelTypeColumn;
     }
 
-    public function setModelTypeColumn(?string $modelTypeColumn): static
+    public function setMorphModelTypeColumn(?string $morphModelTypeColumn): static
     {
-        $this->modelTypeColumn = $modelTypeColumn;
+        $this->morphModelTypeColumn = $morphModelTypeColumn;
 
         return $this;
     }
@@ -97,16 +97,16 @@ class RegisterModificationRelation implements \Approval\Contracts\HasMedia
         return $this->modelName;
     }
 
-    public function setModelForeignId(string $modelForeignId): static
+    public function setForeignIdColumn(string $foreignIdColumn): static
     {
-        $this->modelForeignId = $modelForeignId;
+        $this->foreignIdColumn = $foreignIdColumn;
 
         return $this;
     }
 
-    public function getModelForeignId(): string
+    public function getForeignIdColumn(): string
     {
-        return $this->modelForeignId;
+        return $this->foreignIdColumn;
     }
 
     public function setData(array $data = []): self
@@ -142,11 +142,11 @@ class RegisterModificationRelation implements \Approval\Contracts\HasMedia
         $this->modificationRelation = ModificationRelation::create([
             'modification_id' => $this->getModification()->id,
             'model' => $this->getModelName(),
-            'model_foreign_id' => $this->getModelForeignId(),
+            'foreign_id_column' => $this->getForeignIdColumn(),
             'modifications' => $this->getModifiedData(),
             'action' => $this->getAction()->value,
-            'model_type_column' => $this->getModelTypeColumn(),
-            'model_id_column' => $this->getModelIdColumn()
+            'morph_model_type_column' => $this->getMorphModelTypeColumn(),
+//            'model_id_column' => $this->getModelIdColumn()
         ]);
 
         return $this;
