@@ -6,6 +6,8 @@ namespace Approval\Enums;
 enum ActionEnum: string
 {
     case Create = 'create'; # useful for hasMany or belongsToMany relationship
+    case Update = 'update'; # useful for hasMany or belongsToMany relationship
+    case Delete = 'delete'; # useful for hasMany or belongsToMany relationship
     case UpdateOrCreate = 'update_or_create'; # useful for hasOne relationship
     case DeleteThenCreate = 'delete_then_create'; # useful for hasMany or belongsToMany relationship
 
