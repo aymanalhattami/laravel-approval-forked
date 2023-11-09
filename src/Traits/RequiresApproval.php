@@ -270,6 +270,31 @@ trait RequiresApproval
         }
     }
 
+    public function saveModificationRelationMedia(ModificationRelation $modificationRelation, $model): void
+    {
+        if ($modificationRelation->media()->exists()) {
+            foreach ($modificationRelation->media as $media) {
+                $disk = null;
+                $directory = null;
+                $collectionName = null;
+
+                if ($media->hasCustomProperty('approval_disk')) {
+                    $disk = $media->getCustomProperty('approval_disk');
+                }
+
+                if ($media->hasCustomProperty('approval_directory')) {
+                    $directory = $media->getCustomProperty('approval_directory');
+                }
+
+                if ($media->hasCustomProperty('approval_collection_name')) {
+                    $collectionName = $media->getCustomProperty('approval_collection_name');
+                }
+
+                $media->copy($model, $collectionName, $disk);
+            }
+        }
+    }
+
     public function updateModificationRelation($modification, $modificationRelations): void
     {
         foreach ($modificationRelations as $modificationRelation) {
@@ -383,7 +408,6 @@ trait RequiresApproval
             $modificationRelationModel = $modificationRelation->model::query()
                 ->where($modificationRelation->foreign_id_column, $this->id)
                 ->where($modificationRelation->model_type_column, static::class)
-//                ->where('role_id', $modificationRelation->modifications['role_id']['modified'])
                 ->first();
 
             if (!$modificationRelationModel) {
@@ -407,10 +431,14 @@ trait RequiresApproval
     public function morphDeleteThenCreateModificationRelation($modification, $modificationRelations): void
     {
         $modificationRelations->each(function ($modificationRelation) {
-            $modificationRelation->model::where([
+            $modificationRelationModel = $modificationRelation->model::where([
                 $modificationRelation->model_type_column => static::class,
                 $modificationRelation->foreign_id_column => $this->id
-            ])->delete();
+            ]);
+
+            if ($modificationRelationModel) {
+                $modificationRelationModel->delete();
+            }
         });
 
         foreach ($modificationRelations as $modificationRelation) {
@@ -452,31 +480,6 @@ trait RequiresApproval
                 }
 
                 $media->copy($this, $collectionName, $disk);
-            }
-        }
-    }
-
-    public function saveModificationRelationMedia(ModificationRelation $modificationRelation, $model): void
-    {
-        if ($modificationRelation->media()->exists()) {
-            foreach ($modificationRelation->media as $media) {
-                $disk = null;
-                $directory = null;
-                $collectionName = null;
-
-                if ($media->hasCustomProperty('approval_disk')) {
-                    $disk = $media->getCustomProperty('approval_disk');
-                }
-
-                if ($media->hasCustomProperty('approval_directory')) {
-                    $directory = $media->getCustomProperty('approval_directory');
-                }
-
-                if ($media->hasCustomProperty('approval_collection_name')) {
-                    $collectionName = $media->getCustomProperty('approval_collection_name');
-                }
-
-                $media->copy($model, $collectionName, $disk);
             }
         }
     }
