@@ -3,7 +3,7 @@
 namespace Approval\Traits;
 
 use Approval\ApproveMedia;
-use Approval\ApproveRelation;
+use Approval\ApproveModificationRelation;
 use Approval\Models\Modification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -187,7 +187,7 @@ trait RequiresApproval
                     $modification->save();
                 }
 
-                ApproveRelation::make()
+                ApproveModificationRelation::make()
                     ->setModel($this)
                     ->setModification($modification)
                     ->save();

@@ -7,7 +7,7 @@ use Approval\Models\Modification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class ApproveRelation
+class ApproveModificationRelation
 {
     private Modification $modification;
 
