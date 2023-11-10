@@ -15,8 +15,10 @@ class CreateModificationsTable extends Migration
     {
         Schema::create('modifications', function (Blueprint $table) {
             $table->id();
+            # TODO:: use morph('modifiable')
             $table->integer('modifiable_id')->nullable();
             $table->string('modifiable_type')->nullable();
+            # TODO:: use morph('modifier')
             $table->integer('modifier_id')->nullable();
             $table->string('modifier_type')->nullable();
             $table->boolean('active')->default(true);

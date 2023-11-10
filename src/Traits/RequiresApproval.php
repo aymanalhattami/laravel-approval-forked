@@ -3,11 +3,15 @@
 namespace Approval\Traits;
 
 use Approval\Enums\ActionEnum;
+use Approval\Enums\MediaActionEnum;
 use Approval\Models\Modification;
+use Approval\Models\ModificationMedia;
 use Approval\Models\ModificationRelation;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 trait RequiresApproval
 {
@@ -192,7 +196,7 @@ trait RequiresApproval
      *
      * @return void
      */
-    public function applyModificationChanges(Modification $modification, bool $approved)
+    public function applyModificationChanges(Modification $modification, bool $approved): void
     {
         if ($approved && $this->updateWhenApproved) {
             DB::transaction(function () use ($modification, $approved) {
@@ -241,13 +245,7 @@ trait RequiresApproval
                     $this->updateOrCreateModificationRelation($modification, $modificationRelations);
                 } elseif ($key == ActionEnum::DeleteThenCreate->value) {
                     $this->deleteThenCreateModificationRelation($modification, $modificationRelations);
-                }
-//                elseif ($key == ActionEnum::MorphUpdateOrCreate->value) {
-//                    $this->morphUpdateOrCreateModificationRelation($modification, $modificationRelations);
-//                } elseif ($key == ActionEnum::MorphDeleteThenCreate->value) {
-//                    $this->morphDeleteThenCreateModificationRelation($modification, $modificationRelations);
-//                }
-                else {
+                } else {
                     $this->createModificationRelation($modification, $modificationRelations);
                 }
             }
@@ -409,26 +407,91 @@ trait RequiresApproval
 
     public function saveModificationMedia(Modification $modification): void
     {
-        if ($modification->media()->exists()) {
-            foreach ($modification->media as $media) {
-                $disk = null;
-                $directory = null;
-                $collectionName = null;
+        $modificationMedias = ModificationMedia::query()
+            ->where('model_id', $modification->id)
+            ->where('model_type', $modification::class)
+            ->get();
 
-                if ($media->hasCustomProperty('approval_disk')) {
-                    $disk = $media->getCustomProperty('approval_disk');
+        if ($modificationMedias) {
+            $groupedModificationMedia = $modificationMedias->groupBy('action');
+            if($groupedModificationMedia){
+                foreach ($groupedModificationMedia as $key => $modificationMedia) {
+                    if ($key == MediaActionEnum::Create->value) {
+                        foreach ($modificationMedia as $modificationMediaModel){
+                            $this->createModificationMedia($this, $modificationMediaModel);
+                        }
+                    } elseif ($key == MediaActionEnum::Delete->value) {
+                        foreach ($modificationMedia as $modificationMediaModel){
+                            $this->deleteModificationMedia($this, $modificationMediaModel);
+                        }
+                    } elseif ($key == ActionEnum::DeleteThenCreate->value) {
+                        foreach ($modificationMedia as $modificationMediaModel){
+                            $this->createModificationMedia($this, $modificationMediaModel);
+                        }
+                    } else {
+                        foreach ($modificationMedia as $modificationMediaModel){
+                            $this->createModificationMedia($this, $modificationMediaModel);
+                        }
+                    }
+
                 }
-
-                if ($media->hasCustomProperty('approval_directory')) {
-                    $directory = $media->getCustomProperty('approval_directory');
-                }
-
-                if ($media->hasCustomProperty('approval_collection_name')) {
-                    $collectionName = $media->getCustomProperty('approval_collection_name');
-                }
-
-                $media->copy($this, $collectionName, $disk);
             }
         }
+        ############################################################
+
+//        if ($modification->media()->exists()) {
+//            foreach ($modification->media as $media) {
+//                $disk = null;
+//                $directory = null;
+//                $collectionName = null;
+//
+//                if ($media->hasCustomProperty('approval_disk')) {
+//                    $disk = $media->getCustomProperty('approval_disk');
+//                }
+//
+//                if ($media->hasCustomProperty('approval_directory')) {
+//                    $directory = $media->getCustomProperty('approval_directory');
+//                }
+//
+//                if ($media->hasCustomProperty('approval_collection_name')) {
+//                    $collectionName = $media->getCustomProperty('approval_collection_name');
+//                }
+//
+//                $media->copy($this, $collectionName, $disk);
+//            }
+//        }
+    }
+
+    private function createModificationMedia(Model $model, ModificationMedia $modificationMedia)
+    {
+        $media = $modificationMedia->media;
+        $disk = null;
+        $directory = null;
+        $collectionName = null;
+
+        if ($media->hasCustomProperty('approval_disk')) {
+            $disk = $media->getCustomProperty('approval_disk');
+        }
+
+        if ($media->hasCustomProperty('approval_directory')) {
+            $directory = $media->getCustomProperty('approval_directory');
+        }
+
+        if ($media->hasCustomProperty('approval_collection_name')) {
+            $collectionName = $media->getCustomProperty('approval_collection_name');
+        }
+
+        $media->copy($model, $collectionName, $disk);
+    }
+
+    private function deleteModificationMedia(Model $model, ModificationMedia $modificationMedia)
+    {
+//        dd('delete', $modificationMedia->model);
+
+        Media::query()
+            ->where('model_type', $modificationMedia->model->modifiable_type)
+            ->where('model_id', $modificationMedia->model->modifiable_id)
+            ->delete();
+
     }
 }

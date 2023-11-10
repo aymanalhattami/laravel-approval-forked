@@ -4,9 +4,10 @@ namespace Approval\Traits;
 
 use Approval\Enums\MediaActionEnum;
 use Approval\Models\Modification;
+use Approval\Models\ModificationMedia;
 use Approval\Models\ModificationRelation;
 use Closure;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
@@ -22,7 +23,7 @@ trait HasMedia
     private string $approvalDisk = 'public';
     private string $approvalDirectory = '';
     private string $approvalMediaCollectionName = 'approval';
-    private MediaActionEnum $action = MediaActionEnum::Create;
+    private Closure|MediaActionEnum $action = MediaActionEnum::Create;
 
     public static function make(): static
     {
@@ -31,10 +32,10 @@ trait HasMedia
 
     private function getAction(): MediaActionEnum
     {
-        return $this->action;
+        return $this->action instanceof Closure ? ($this->action)() : $this->action;
     }
 
-    public function setAction(MediaActionEnum $action): static
+    public function setAction(Closure|MediaActionEnum $action): static
     {
         $this->action = $action;
 
@@ -143,19 +144,36 @@ trait HasMedia
      */
     public function save(): static
     {
-        foreach ($this->getFiles() as $key => $file){
-            # TODO:: Check that file is an instance of UploadedFile class
-            $this->getModel()
-                ->addMedia($file->getRealPath())
-                ->withCustomProperties([
-                    'approval_disk' => $this->getApprovalDisk(),
-                    'approval_directory' => $this->getApprovalDirectory(),
-                    'approval_collection_name' => $this->getApprovalMediaCollectionName(),
+        DB::transaction(function () {
+            if ($this->getAction() == MediaActionEnum::Delete) {
+                ModificationMedia::create([
+                    'media_id' => null,
+                    'model_id' => $this->getModel()->id,
+                    'model_type' => $this->getModel()::class,
                     'action' => $this->getAction()->value
-                ])
-                ->usingName($file->getClientOriginalName())
-                ->toMediaCollection($this->getMediaCollectionName(), $this->getDisk());
-        }
+                ]);
+            } else {
+                foreach ($this->getFiles() as $key => $file) {
+                    # TODO:: Check that file is an instance of UploadedFile class
+                    $media = $this->getModel()
+                        ->addMedia($file->getRealPath())
+                        ->withCustomProperties([
+                            'approval_disk' => $this->getApprovalDisk(),
+                            'approval_directory' => $this->getApprovalDirectory(),
+                            'approval_collection_name' => $this->getApprovalMediaCollectionName(),
+                        ])
+                        ->usingName($file->getClientOriginalName())
+                        ->toMediaCollection($this->getMediaCollectionName(), $this->getDisk());
+
+                    ModificationMedia::create([
+                        'media_id' => $media?->id,
+                        'model_id' => $this->getModel()->id,
+                        'model_type' => $this->getModel()::class,
+                        'action' => $this->getAction()->value
+                    ]);
+                }
+            }
+        });
 
         return $this;
     }

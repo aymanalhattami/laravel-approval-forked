@@ -27,7 +27,7 @@ class ModificationRelation extends Model implements HasMedia
         'condition_columns' => 'json',
     ];
 
-    public function modification()
+    public function modification(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(config('approval.models.modification', Modification::class));
     }
