@@ -15,7 +15,6 @@ class RegisterModificationRelation
     private string $foreignIdColumn;
     private ActionEnum $action = ActionEnum::Create;
     private array $conditionColumns = [];
-//    protected string|null $modelIdColumn = null;
 
     public static function make(): self
     {
@@ -33,18 +32,6 @@ class RegisterModificationRelation
 
         return $this;
     }
-
-//    private function getModelIdColumn(): ?string
-//    {
-//        return $this->modelIdColumn;
-//    }
-//
-//    public function setModelIdColumn(?string $modelIdColumn): static
-//    {
-//        $this->modelIdColumn = $modelIdColumn;
-//
-//        return $this;
-//    }
 
     private function getAction(): ActionEnum
     {
@@ -69,13 +56,6 @@ class RegisterModificationRelation
     {
         return $this->modification;
     }
-
-//    public function setModificationRelation(ModificationRelation $modificationRelation): self
-//    {
-//        $this->modificationRelation = $modificationRelation;
-//
-//        return $this;
-//    }
 
     public function getModificationRelation(): ModificationRelation
     {
