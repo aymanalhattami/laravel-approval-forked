@@ -17,6 +17,7 @@ class ModificationMedia extends Model
     protected $guarded = ['id'];
     protected $casts = [
         'action' => MediaActionEnum::class,
+        'condition_columns' => 'json'
     ];
 
 

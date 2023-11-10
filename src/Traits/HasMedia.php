@@ -24,10 +24,23 @@ trait HasMedia
     private string $approvalDirectory = '';
     private string $approvalMediaCollectionName = 'approval';
     private Closure|MediaActionEnum $action = MediaActionEnum::Create;
+    private array|Closure $conditionColumns = [];
 
     public static function make(): static
     {
         return new static;
+    }
+
+    private function getConditionColumns(): array
+    {
+        return $this->conditionColumns instanceof Closure ? ($this->conditionColumns)() : $this->conditionColumns;
+    }
+
+    public function setConditionColumns(array|Closure $conditionColumns): self
+    {
+        $this->conditionColumns = $conditionColumns;
+
+        return $this;
     }
 
     private function getAction(): MediaActionEnum
@@ -150,7 +163,8 @@ trait HasMedia
                     'media_id' => null,
                     'model_id' => $this->getModel()->id,
                     'model_type' => $this->getModel()::class,
-                    'action' => $this->getAction()->value
+                    'action' => $this->getAction()->value,
+                    'condition_columns' => $this->getConditionColumns()
                 ]);
             } else {
                 foreach ($this->getFiles() as $key => $file) {
@@ -169,7 +183,8 @@ trait HasMedia
                         'media_id' => $media?->id,
                         'model_id' => $this->getModel()->id,
                         'model_type' => $this->getModel()::class,
-                        'action' => $this->getAction()->value
+                        'action' => $this->getAction()->value,
+                        'condition_columns' => $this->getConditionColumns()
                     ]);
                 }
             }

@@ -426,7 +426,7 @@ trait RequiresApproval
                         }
                     } elseif ($key == ActionEnum::DeleteThenCreate->value) {
                         foreach ($modificationMedia as $modificationMediaModel){
-                            $this->createModificationMedia($this, $modificationMediaModel);
+                            $this->deleteThenCreateModificationMedia($this, $modificationMediaModel);
                         }
                     } else {
                         foreach ($modificationMedia as $modificationMediaModel){
@@ -437,32 +437,9 @@ trait RequiresApproval
                 }
             }
         }
-        ############################################################
-
-//        if ($modification->media()->exists()) {
-//            foreach ($modification->media as $media) {
-//                $disk = null;
-//                $directory = null;
-//                $collectionName = null;
-//
-//                if ($media->hasCustomProperty('approval_disk')) {
-//                    $disk = $media->getCustomProperty('approval_disk');
-//                }
-//
-//                if ($media->hasCustomProperty('approval_directory')) {
-//                    $directory = $media->getCustomProperty('approval_directory');
-//                }
-//
-//                if ($media->hasCustomProperty('approval_collection_name')) {
-//                    $collectionName = $media->getCustomProperty('approval_collection_name');
-//                }
-//
-//                $media->copy($this, $collectionName, $disk);
-//            }
-//        }
     }
 
-    private function createModificationMedia(Model $model, ModificationMedia $modificationMedia)
+    private function createModificationMedia(Model $model, ModificationMedia $modificationMedia): void
     {
         $media = $modificationMedia->media;
         $disk = null;
@@ -484,14 +461,26 @@ trait RequiresApproval
         $media->copy($model, $collectionName, $disk);
     }
 
-    private function deleteModificationMedia(Model $model, ModificationMedia $modificationMedia)
+    private function deleteModificationMedia(Model $model, ModificationMedia $modificationMedia): void
     {
-//        dd('delete', $modificationMedia->model);
-
-        Media::query()
+        $mediaQuery = Media::query()
             ->where('model_type', $modificationMedia->model->modifiable_type)
-            ->where('model_id', $modificationMedia->model->modifiable_id)
-            ->delete();
+            ->where('model_id', $modificationMedia->model->modifiable_id);
 
+        if(count($modificationMedia->condition_columns)){
+            foreach ($modificationMedia->condition_columns as $column => $value){
+                $mediaQuery->where($column, $value);
+            }
+        }
+
+        $mediaQuery->delete();
+    }
+
+    private function deleteThenCreateModificationMedia(Model $model, ModificationMedia $modificationMedia): void
+    {
+        DB::transaction(function () use ($model, $modificationMedia) {
+            $this->deleteModificationMedia($model, $modificationMedia);
+            $this->createModificationMedia($model, $modificationMedia);
+        });
     }
 }

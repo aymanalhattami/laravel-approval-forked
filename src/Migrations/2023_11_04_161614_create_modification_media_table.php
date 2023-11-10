@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('media_id')->nullable()->constrained()->noActionOnDelete();
             $table->morphs('model');
             $table->string('action')->default(\Approval\Enums\MediaActionEnum::Create->value);
+            $table->json('condition_columns')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
