@@ -6,6 +6,7 @@ use Approval\Enums\ActionEnum;
 use Approval\Enums\MediaActionEnum;
 use Approval\Models\Modification;
 use Approval\Models\ModificationMedia;
+use Approval\Models\ModificationRelation;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +14,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ApproveMedia
 {
-    private Modification $modification;
+    private Modification|ModificationRelation $modification;
     private Model $model;
 
     public static function make(): static
@@ -21,12 +22,12 @@ class ApproveMedia
         return new static;
     }
 
-    public function getModification(): Modification
+    public function getModification(): Modification|ModificationRelation
     {
         return $this->modification;
     }
 
-    public function setModification(Modification $modification): static
+    public function setModification(Modification|ModificationRelation $modification): static
     {
         $this->modification = $modification;
 

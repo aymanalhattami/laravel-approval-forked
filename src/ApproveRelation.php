@@ -78,35 +78,12 @@ class ApproveRelation
             $modificationRelationModel->{$modificationRelation->foreign_id_column} = $this->getModel()->id;
             $modificationRelationModel->save();
 
-            // save media
-//            $this->saveModificationRelationMedia($modificationRelation, $modificationRelationModel);
+            ApproveMedia::make()
+                ->setModification($modificationRelationModel)
+                ->setModel($this->getModel())
+                ->save();
         }
     }
-
-//    public function saveModificationRelationMedia(ModificationRelation $modificationRelation, $model): void
-//    {
-//        if ($modificationRelation->media()->exists()) {
-//            foreach ($modificationRelation->media as $media) {
-//                $disk = null;
-//                $directory = null;
-//                $collectionName = null;
-//
-//                if ($media->hasCustomProperty('approval_disk')) {
-//                    $disk = $media->getCustomProperty('approval_disk');
-//                }
-//
-//                if ($media->hasCustomProperty('approval_directory')) {
-//                    $directory = $media->getCustomProperty('approval_directory');
-//                }
-//
-//                if ($media->hasCustomProperty('approval_collection_name')) {
-//                    $collectionName = $media->getCustomProperty('approval_collection_name');
-//                }
-//
-//                $media->copy($model, $collectionName, $disk);
-//            }
-//        }
-//    }
 
     public function update($modificationRelations): void
     {
@@ -134,8 +111,10 @@ class ApproveRelation
 
             $modificationRelationModel->save();
 
-            // save media
-//            $this->saveModificationRelationMedia($modificationRelation, $modificationRelationModel);
+            ApproveMedia::make()
+                ->setModification($modificationRelationModel)
+                ->setModel($this->getModel())
+                ->save();
         }
     }
 
@@ -179,8 +158,10 @@ class ApproveRelation
             $modificationRelationModel->{$modificationRelation->foreign_id_column} = $this->getModel()->id;
             $modificationRelationModel->save();
 
-            // save media
-//            $this->saveModificationRelationMedia($modificationRelation, $modificationRelationModel);
+            ApproveMedia::make()
+                ->setModification($modificationRelationModel)
+                ->setModel($this->getModel())
+                ->save();
         }
     }
 
@@ -211,8 +192,10 @@ class ApproveRelation
                     $modificationRelationModel->{$modificationRelation->foreign_id_column} = $this->getModel()->id;
                     $modificationRelationModel->save();
 
-                    // save media
-//                    $this->saveModificationRelationMedia($modificationRelation, $modificationRelationModel);
+                    ApproveMedia::make()
+                        ->setModification($modificationRelationModel)
+                        ->setModel($this->getModel())
+                        ->save();
                 }
             }
         });
