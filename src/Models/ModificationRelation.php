@@ -24,7 +24,7 @@ class ModificationRelation extends Model implements HasMedia
      */
     protected $casts = [
         'modifications' => 'json',
-        'condition_columns' => 'array',
+        'condition_columns' => 'json',
     ];
 
     public function modification()
