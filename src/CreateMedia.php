@@ -4,7 +4,7 @@ namespace Approval;
 
 use Approval\Traits\HasMedia;
 
-class RegisterMedia
+class CreateMedia
 {
     use HasMedia;
 }

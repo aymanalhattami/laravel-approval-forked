@@ -6,7 +6,7 @@ use Approval\Enums\ActionEnum;
 use Approval\Models\Modification;
 use Approval\Models\ModificationRelation;
 
-class RegisterModificationRelation
+class CreateModificationRelation
 {
     private string $modelName;
 
