@@ -5,6 +5,7 @@ namespace Approval;
 use Approval\Enums\ActionEnum;
 use Approval\Models\Modification;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class ApproveRelation
 {
