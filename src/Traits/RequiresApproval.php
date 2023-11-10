@@ -2,6 +2,7 @@
 
 namespace Approval\Traits;
 
+use Approval\ApproveMedia;
 use Approval\Enums\ActionEnum;
 use Approval\Enums\MediaActionEnum;
 use Approval\Models\Modification;
@@ -215,8 +216,11 @@ trait RequiresApproval
                     $modification->save();
                 }
 
-                $this->saveModificationRelations($modification);
-                $this->saveModificationMedia($modification);
+//                $this->saveModificationRelations($modification);
+                ApproveMedia::make()
+                    ->setModification($modification)
+                    ->setModel($this)
+                    ->save();
             });
         } elseif ($approved === false) {
             if ($this->deleteWhenDisapproved) {
@@ -369,118 +373,5 @@ trait RequiresApproval
             // save media
             $this->saveModificationRelationMedia($modificationRelation, $modificationRelationModel);
         }
-    }
-
-    public function deleteThenCreateModificationRelation($modification, $modificationRelations): void
-    {
-        DB::transaction(function() use($modification, $modificationRelations){
-            $modificationRelations->each(function ($modificationRelation) {
-                $modificationRelationQuery = $modificationRelation->model::query()
-                    ->where($modificationRelation->foreign_id_column, $this->id);
-
-                if(count($modificationRelation->condition_columns)){
-                    foreach ($modificationRelation->condition_columns as $column => $value){
-                        $modificationRelationQuery->where($column, $value);
-                    }
-                }
-
-                $modificationRelationQuery->delete();
-            });
-
-            foreach ($modificationRelations as $modificationRelation) {
-                if (count($modificationRelation->modifications)) {
-                    $modificationRelationModel = new $modificationRelation->model;
-                    $modificationRelationModel->setForcedApprovalUpdate(true);
-
-                    foreach ($modificationRelation->modifications as $key => $value) {
-                        $modificationRelationModel->{$key} = $value['modified'];
-                    }
-                    $modificationRelationModel->{$modificationRelation->foreign_id_column} = $this->id;
-                    $modificationRelationModel->save();
-
-                    // save media
-                    $this->saveModificationRelationMedia($modificationRelation, $modificationRelationModel);
-                }
-            }
-        });
-    }
-
-    public function saveModificationMedia(Modification $modification): void
-    {
-        $modificationMedias = ModificationMedia::query()
-            ->where('model_id', $modification->id)
-            ->where('model_type', $modification::class)
-            ->get();
-
-        if ($modificationMedias) {
-            $groupedModificationMedia = $modificationMedias->groupBy('action');
-            if($groupedModificationMedia){
-                foreach ($groupedModificationMedia as $key => $modificationMedia) {
-                    if ($key == MediaActionEnum::Create->value) {
-                        foreach ($modificationMedia as $modificationMediaModel){
-                            $this->createModificationMedia($this, $modificationMediaModel);
-                        }
-                    } elseif ($key == MediaActionEnum::Delete->value) {
-                        foreach ($modificationMedia as $modificationMediaModel){
-                            $this->deleteModificationMedia($this, $modificationMediaModel);
-                        }
-                    } elseif ($key == ActionEnum::DeleteThenCreate->value) {
-                        foreach ($modificationMedia as $modificationMediaModel){
-                            $this->deleteThenCreateModificationMedia($this, $modificationMediaModel);
-                        }
-                    } else {
-                        foreach ($modificationMedia as $modificationMediaModel){
-                            $this->createModificationMedia($this, $modificationMediaModel);
-                        }
-                    }
-
-                }
-            }
-        }
-    }
-
-    private function createModificationMedia(Model $model, ModificationMedia $modificationMedia): void
-    {
-        $media = $modificationMedia->media;
-        $disk = null;
-        $directory = null;
-        $collectionName = null;
-
-        if ($media->hasCustomProperty('approval_disk')) {
-            $disk = $media->getCustomProperty('approval_disk');
-        }
-
-        if ($media->hasCustomProperty('approval_directory')) {
-            $directory = $media->getCustomProperty('approval_directory');
-        }
-
-        if ($media->hasCustomProperty('approval_collection_name')) {
-            $collectionName = $media->getCustomProperty('approval_collection_name');
-        }
-
-        $media->copy($model, $collectionName, $disk);
-    }
-
-    private function deleteModificationMedia(Model $model, ModificationMedia $modificationMedia): void
-    {
-        $mediaQuery = Media::query()
-            ->where('model_type', $modificationMedia->model->modifiable_type)
-            ->where('model_id', $modificationMedia->model->modifiable_id);
-
-        if(count($modificationMedia->condition_columns)){
-            foreach ($modificationMedia->condition_columns as $column => $value){
-                $mediaQuery->where($column, $value);
-            }
-        }
-
-        $mediaQuery->delete();
-    }
-
-    private function deleteThenCreateModificationMedia(Model $model, ModificationMedia $modificationMedia): void
-    {
-        DB::transaction(function () use ($model, $modificationMedia) {
-            $this->deleteModificationMedia($model, $modificationMedia);
-            $this->createModificationMedia($model, $modificationMedia);
-        });
     }
 }
