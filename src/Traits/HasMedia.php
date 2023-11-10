@@ -3,6 +3,8 @@
 namespace Approval\Traits;
 
 use Approval\Enums\MediaActionEnum;
+use Approval\Models\Modification;
+use Approval\Models\ModificationRelation;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
@@ -11,7 +13,7 @@ use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 trait HasMedia
 {
     private array|Closure $files = [];
-    private Model $model;
+    private Modification|ModificationRelation $model;
 
     private string $disk = 'public';
     private string $directory = '';
@@ -39,12 +41,12 @@ trait HasMedia
         return $this;
     }
 
-    private function getModel(): Model
+    private function getModel(): Modification|ModificationRelation
     {
         return $this->model;
     }
 
-    public function setModel(Model $model): static
+    public function setModel(Modification|ModificationRelation $model): static
     {
         $this->model = $model;
 
@@ -142,6 +144,7 @@ trait HasMedia
     public function save(): static
     {
         foreach ($this->getFiles() as $key => $file){
+            # TODO:: Check that file is an instance of UploadedFile class
             $this->getModel()
                 ->addMedia($file->getRealPath())
                 ->withCustomProperties([
