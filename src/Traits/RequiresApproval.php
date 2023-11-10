@@ -241,11 +241,13 @@ trait RequiresApproval
                     $this->updateOrCreateModificationRelation($modification, $modificationRelations);
                 } elseif ($key == ActionEnum::DeleteThenCreate->value) {
                     $this->deleteThenCreateModificationRelation($modification, $modificationRelations);
-                } elseif ($key == ActionEnum::MorphUpdateOrCreate->value) {
-                    $this->morphUpdateOrCreateModificationRelation($modification, $modificationRelations);
-                } elseif ($key == ActionEnum::MorphDeleteThenCreate->value) {
-                    $this->morphDeleteThenCreateModificationRelation($modification, $modificationRelations);
-                } else {
+                }
+//                elseif ($key == ActionEnum::MorphUpdateOrCreate->value) {
+//                    $this->morphUpdateOrCreateModificationRelation($modification, $modificationRelations);
+//                } elseif ($key == ActionEnum::MorphDeleteThenCreate->value) {
+//                    $this->morphDeleteThenCreateModificationRelation($modification, $modificationRelations);
+//                }
+                else {
                     $this->createModificationRelation($modification, $modificationRelations);
                 }
             }
@@ -345,11 +347,11 @@ trait RequiresApproval
             $modificationRelationModelQuery = $modificationRelation->model::query()
                 ->where($modificationRelation->foreign_id_column, $this->id);
 
-//            if(count($modificationRelation->condition_columns)){
-//                foreach ($modificationRelation->condition_columns as $column){
-//                    $modificationRelationModelQuery->where($column, $modificationRelation->modifications[$column]['modified']);
-//                }
-//            }
+            if(count($modificationRelation->condition_columns)){
+                foreach ($modificationRelation->condition_columns as $column){
+                    $modificationRelationModelQuery->where($column, $modificationRelation->modifications[$column]['modified']);
+                }
+            }
 
             $modificationRelationModel = $modificationRelationModelQuery->first();
 
@@ -373,91 +375,105 @@ trait RequiresApproval
 
     public function deleteThenCreateModificationRelation($modification, $modificationRelations): void
     {
-        $modificationRelations->each(function ($modificationRelation) {
-            $modificationRelationModel = $modificationRelation->model::query()
-                ->where($modificationRelation->foreign_id_column, $this->id)
-                ->first();
+        DB::transaction(function() use($modification, $modificationRelations){
+            $modificationRelations->each(function ($modificationRelation) {
+                $modificationRelationQuery = $modificationRelation->model::query()
+                    ->where($modificationRelation->foreign_id_column, $this->id);
 
-            if ($modificationRelationModel) {
-                $modificationRelationModel->delete();
-            }
-        });
-
-        foreach ($modificationRelations as $modificationRelation) {
-            if (count($modificationRelation->modifications)) {
-                $modificationRelationModel = new $modificationRelation->model;
-                $modificationRelationModel->setForcedApprovalUpdate(true);
-
-                foreach ($modificationRelation->modifications as $key => $value) {
-                    $modificationRelationModel->{$key} = $value['modified'];
+                if(count($modificationRelation->condition_columns)){
+                    foreach ($modificationRelation->condition_columns as $column){
+                        $modificationRelationQuery->where($column, $modificationRelation->modifications[$column]['modified']);
+                    }
                 }
 
-                $modificationRelationModel->{$modificationRelation->foreign_id_column} = $this->id;
-                $modificationRelationModel->save();
+                $modificationRelationQuery->delete();
+            });
 
-                // save media
-                $this->saveModificationRelationMedia($modificationRelation, $modificationRelationModel);
-            }
+            foreach ($modificationRelations as $modificationRelation) {
+                if (count($modificationRelation->modifications)) {
+                    $modificationRelationModel = new $modificationRelation->model;
+                    $modificationRelationModel->setForcedApprovalUpdate(true);
 
-        }
-    }
+                    foreach ($modificationRelation->modifications as $key => $value) {
+                        $modificationRelationModel->{$key} = $value['modified'];
+                    }
+                    $modificationRelationModel->{$modificationRelation->foreign_id_column} = $this->id;
+                    $modificationRelationModel->save();
 
-    public function morphUpdateOrCreateModificationRelation($modification, $modificationRelations): void
-    {
-        foreach ($modificationRelations as $modificationRelation) {
-            $modificationRelationModel = $modificationRelation->model::query()
-                ->where($modificationRelation->foreign_id_column, $this->id)
-                ->where($modificationRelation->model_type_column, static::class)
-                ->first();
-
-            if (!$modificationRelationModel) {
-                $modificationRelationModel = new $modificationRelation->model;
-            }
-
-            $modificationRelationModel->setForcedApprovalUpdate(true);
-
-            foreach ($modificationRelation->modifications as $key => $value) {
-                $modificationRelationModel->{$key} = $value['modified'];
-            }
-
-            $modificationRelationModel->{$modificationRelation->foreign_id_column} = $this->id;
-            $modificationRelationModel->save();
-
-            // save media
-            $this->saveModificationRelationMedia($modificationRelation, $modificationRelationModel);
-        }
-    }
-
-    public function morphDeleteThenCreateModificationRelation($modification, $modificationRelations): void
-    {
-        $modificationRelations->each(function ($modificationRelation) {
-            $modificationRelationModel = $modificationRelation->model::where([
-                $modificationRelation->model_type_column => static::class,
-                $modificationRelation->foreign_id_column => $this->id
-            ]);
-
-            if ($modificationRelationModel) {
-                $modificationRelationModel->delete();
+                    // save media
+                    $this->saveModificationRelationMedia($modificationRelation, $modificationRelationModel);
+                }
             }
         });
-
-        foreach ($modificationRelations as $modificationRelation) {
-            if (count($modificationRelation->modifications)) {
-                $modificationRelationModel = new $modificationRelation->model;
-                $modificationRelationModel->setForcedApprovalUpdate(true);
-
-                foreach ($modificationRelation->modifications as $key => $value) {
-                    $modificationRelationModel->{$key} = $value['modified'];
-                }
-                $modificationRelationModel->{$modificationRelation->foreign_id_column} = $this->id;
-                $modificationRelationModel->save();
-
-                // save media
-                $this->saveModificationRelationMedia($modificationRelation, $modificationRelationModel);
-            }
-
-        }
     }
+
+//    public function morphUpdateOrCreateModificationRelation($modification, $modificationRelations): void
+//    {
+//        foreach ($modificationRelations as $modificationRelation) {
+//            $modificationRelationQuery = $modificationRelation->model::query()
+//                ->where($modificationRelation->foreign_id_column, $this->id);
+//
+//            if(count($modificationRelation->condition_columns)){
+//                foreach ($modificationRelation->condition_columns as $key){
+//                    $modificationRelationQuery->where($key, $modificationRelation->modifications[$key]['modified']);
+//                }
+//            }
+//
+//            $modificationRelationModel = $modificationRelationQuery->first();
+//
+//            if (!$modificationRelationModel) {
+//                $modificationRelationModel = new $modificationRelation->model;
+//            }
+//
+//            $modificationRelationModel->setForcedApprovalUpdate(true);
+//
+//            foreach ($modificationRelation->modifications as $key => $value) {
+//                $modificationRelationModel->{$key} = $value['modified'];
+//            }
+//
+//            $modificationRelationModel->{$modificationRelation->foreign_id_column} = $this->id;
+//            $modificationRelationModel->save();
+//
+//            // save media
+//            $this->saveModificationRelationMedia($modificationRelation, $modificationRelationModel);
+//        }
+//    }
+
+//    public function morphDeleteThenCreateModificationRelation($modification, $modificationRelations): void
+//    {
+//        DB::transaction(function() use($modification, $modificationRelations){
+//            $modificationRelations->each(function ($modificationRelation) {
+//                $modificationRelationQuery = $modificationRelation->model::query()
+//                    ->where($modificationRelation->foreign_id_column, $this->id);
+//
+//                if(count($modificationRelation->condition_columns)){
+//                    foreach ($modificationRelation->condition_columns as $key){
+//                        $modificationRelationQuery->where($key, $modificationRelation->modifications[$key]['modified']);
+//                    }
+//                }
+//
+//                if ($modificationRelationQuery->first()) {
+//                    $modificationRelationQuery->delete();
+//                }
+//            });
+//
+//            foreach ($modificationRelations as $modificationRelation) {
+//                if (count($modificationRelation->modifications)) {
+//                    $modificationRelationModel = new $modificationRelation->model;
+//                    $modificationRelationModel->setForcedApprovalUpdate(true);
+//
+//                    foreach ($modificationRelation->modifications as $key => $value) {
+//                        $modificationRelationModel->{$key} = $value['modified'];
+//                    }
+//                    $modificationRelationModel->{$modificationRelation->foreign_id_column} = $this->id;
+//                    $modificationRelationModel->save();
+//
+//                    // save media
+//                    $this->saveModificationRelationMedia($modificationRelation, $modificationRelationModel);
+//                }
+//            }
+//        });
+//    }
 
     public function saveModificationMedia(Modification $modification): void
     {

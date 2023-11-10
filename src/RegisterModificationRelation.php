@@ -14,7 +14,7 @@ class RegisterModificationRelation
     private ModificationRelation $modificationRelation;
     private string $foreignIdColumn;
     private ActionEnum $action = ActionEnum::Create;
-    private string|null $modelTypeColumn = null;
+    private array $conditionColumns = [];
 //    protected string|null $modelIdColumn = null;
 
     public static function make(): self
@@ -22,14 +22,14 @@ class RegisterModificationRelation
         return new static;
     }
 
-    private function getModelTypeColumn(): ?string
+    private function getConditionColumns(): array
     {
-        return $this->modelTypeColumn;
+        return $this->conditionColumns;
     }
 
-    public function setModelTypeColumn(?string $modelTypeColumn): static
+    public function setConditionColumns(array $conditionColumns): static
     {
-        $this->modelTypeColumn = $modelTypeColumn;
+        $this->conditionColumns = $conditionColumns;
 
         return $this;
     }
@@ -137,7 +137,7 @@ class RegisterModificationRelation
             'foreign_id_column' => $this->getForeignIdColumn(),
             'modifications' => $this->getModifiedData(),
             'action' => $this->getAction()->value,
-            'model_type_column' => $this->getModelTypeColumn(),
+            'condition_columns' => $this->getConditionColumns(),
         ]);
 
         return $this;
