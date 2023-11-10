@@ -79,7 +79,7 @@ class ApproveRelation
             $modificationRelationModel->save();
 
             ApproveMedia::make()
-                ->setModification($modificationRelationModel)
+                ->setModification($modificationRelation)
                 ->setModel($this->getModel())
                 ->save();
         }
