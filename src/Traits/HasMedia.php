@@ -14,16 +14,23 @@ use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 trait HasMedia
 {
     private array|Closure $files = [];
+
     private Modification|ModificationRelation $model;
 
     private string $disk = 'public';
+
     private string $directory = '';
+
     private string $mediaCollectionName = 'modification';
 
     private string $approvalDisk = 'public';
+
     private string $approvalDirectory = '';
+
     private string $approvalMediaCollectionName = 'approval';
+
     private Closure|MediaActionEnum $action = MediaActionEnum::Create;
+
     private array|Closure $conditionColumns = [];
 
     public static function make(): static
@@ -164,11 +171,11 @@ trait HasMedia
                     'model_id' => $this->getModel()->id,
                     'model_type' => $this->getModel()::class,
                     'action' => $this->getAction()->value,
-                    'condition_columns' => $this->getConditionColumns()
+                    'condition_columns' => $this->getConditionColumns(),
                 ]);
             } else {
                 foreach ($this->getFiles() as $key => $file) {
-                    # TODO:: Check that file is an instance of UploadedFile class
+                    // TODO:: Check that file is an instance of UploadedFile class
                     $media = $this->getModel()
                         ->addMedia($file->getRealPath())
                         ->withCustomProperties([
@@ -184,7 +191,7 @@ trait HasMedia
                         'model_id' => $this->getModel()->id,
                         'model_type' => $this->getModel()::class,
                         'action' => $this->getAction()->value,
-                        'condition_columns' => $this->getConditionColumns()
+                        'condition_columns' => $this->getConditionColumns(),
                     ]);
                 }
             }

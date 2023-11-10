@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 class ApproveRelation
 {
     private Modification $modification;
+
     private Model $model;
 
     public static function make(): static
@@ -91,7 +92,7 @@ class ApproveRelation
             $modificationRelationModelQuery = $modificationRelation->model::query()
                 ->where($modificationRelation->foreign_id_column, $this->getModel()->id);
 
-            if(count($modificationRelation->condition_columns)){
+            if (count($modificationRelation->condition_columns)) {
                 foreach ($modificationRelation->condition_columns as $column => $value) {
                     $modificationRelationModelQuery->where($column, $value);
                 }
@@ -99,7 +100,7 @@ class ApproveRelation
 
             $modificationRelationModel = $modificationRelationModelQuery->first();
 
-            if (!$modificationRelationModel) {
+            if (! $modificationRelationModel) {
                 continue;
             }
 
@@ -137,7 +138,7 @@ class ApproveRelation
             $modificationRelationModelQuery = $modificationRelation->model::query()
                 ->where($modificationRelation->foreign_id_column, $this->getModel()->id);
 
-            if(count($modificationRelation->condition_columns)){
+            if (count($modificationRelation->condition_columns)) {
                 foreach ($modificationRelation->condition_columns as $column => $value) {
                     $modificationRelationModelQuery->where($column, $value);
                 }
@@ -145,7 +146,7 @@ class ApproveRelation
 
             $modificationRelationModel = $modificationRelationModelQuery->first();
 
-            if (!$modificationRelationModel) {
+            if (! $modificationRelationModel) {
                 $modificationRelationModel = new $modificationRelation->model;
             }
 
@@ -167,13 +168,13 @@ class ApproveRelation
 
     public function deleteThenCreate($modificationRelations): void
     {
-        DB::transaction(function() use($modificationRelations){
+        DB::transaction(function () use ($modificationRelations) {
             $modificationRelations->each(function ($modificationRelation) {
                 $modificationRelationQuery = $modificationRelation->model::query()
                     ->where($modificationRelation->foreign_id_column, $this->getModel()->id);
 
-                if(count($modificationRelation->condition_columns)){
-                    foreach ($modificationRelation->condition_columns as $column => $value){
+                if (count($modificationRelation->condition_columns)) {
+                    foreach ($modificationRelation->condition_columns as $column => $value) {
                         $modificationRelationQuery->where($column, $value);
                     }
                 }

@@ -10,12 +10,8 @@ trait ApprovesChanges
     /**
      * Defines if this model is allowed to cast their approval
      * should be actioned for this model.
-     *
-     * @param \Approval\Models\Modification $modification
-     *
-     * @return bool
      */
-    protected function authorizedToApprove(/* @scrutinizer ignore-unused */\Approval\Models\Modification $modification): bool
+    protected function authorizedToApprove(/* @scrutinizer ignore-unused */ \Approval\Models\Modification $modification): bool
     {
         return true;
     }
@@ -23,28 +19,19 @@ trait ApprovesChanges
     /**
      * Defines if this model is allowed to cast their disapproval
      * should be actioned for this model.
-     *
-     * @param \Approval\Models\Modification $modification
-     *
-     * @return bool
      */
-    protected function authorizedToDisapprove(/* @scrutinizer ignore-unused */\Approval\Models\Modification $modification): bool
+    protected function authorizedToDisapprove(/* @scrutinizer ignore-unused */ \Approval\Models\Modification $modification): bool
     {
         return true;
     }
 
     /**
      * Approve a modification.
-     *
-     * @param \Approval\Models\Modification $modification
-     * @param string|null $reason
-     *
-     * @return bool
      */
-    public function approve(\Approval\Models\Modification $modification, ?string $reason = null): bool
+    public function approve(\Approval\Models\Modification $modification, string $reason = null): bool
     {
         if ($this->authorizedToApprove($modification)) {
-            DB::transaction(function() use ($modification, $reason) {
+            DB::transaction(function () use ($modification, $reason) {
                 // Prevent disapproving and approving
                 if ($disapproval = $this->disapprovals()->where([
                     'disapprover_id' => $this->{$this->primaryKey},
@@ -60,7 +47,7 @@ trait ApprovesChanges
                     'approver_id' => $this->{$this->primaryKey},
                     'approver_type' => get_class(),
                     'modification_id' => $modification->id,
-                    'reason' => $reason
+                    'reason' => $reason,
                 ]);
 
                 $modification->fresh();
@@ -83,20 +70,15 @@ trait ApprovesChanges
 
     /**
      * Disapprove a modification.
-     *
-     * @param \Approval\Models\Modification $modification
-     * @param string|null $reason
-     *
-     * @return bool
      */
-    public function disapprove(\Approval\Models\Modification $modification, ?string $reason = null): bool
+    public function disapprove(\Approval\Models\Modification $modification, string $reason = null): bool
     {
         if ($this->authorizedToDisapprove($modification)) {
 
             // Prevent approving and disapproving
             if ($approval = $this->approvals()->where([
-                'approver_id'     => $this->{$this->primaryKey},
-                'approver_type'   => get_class(),
+                'approver_id' => $this->{$this->primaryKey},
+                'approver_type' => get_class(),
                 'modification_id' => $modification->id,
             ])->first()) {
                 $approval->delete();
@@ -105,10 +87,10 @@ trait ApprovesChanges
             // Prevent duplicates
             $disapprovalModel = config('approval.models.disapproval', \Approval\Models\Disapproval::class);
             $disapprovalModel::firstOrCreate([
-                'disapprover_id'   => $this->{$this->primaryKey},
+                'disapprover_id' => $this->{$this->primaryKey},
                 'disapprover_type' => get_class(),
-                'modification_id'  => $modification->id,
-                'reason' => $reason
+                'modification_id' => $modification->id,
+                'reason' => $reason,
             ]);
 
             $modification->fresh();
@@ -130,21 +112,17 @@ trait ApprovesChanges
 
     /**
      * Return Approval relations via moprhMany.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
-    public function approvals()
+    public function approvals(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
         return $this->/* @scrutinizer ignore-call */ morphMany(Approval::class, 'approver');
     }
 
     /**
      * Return Disapproval relations via moprhMany.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
-    public function disapprovals()
+    public function disapprovals(): \Illuminate\Database\Eloquent\Relations\MorphMany
     {
-        return $this->/* @scrutinizer ignore-call */morphMany(\Approval\Models\Disapproval::class, 'disapprover');
+        return $this->/* @scrutinizer ignore-call */ morphMany(\Approval\Models\Disapproval::class, 'disapprover');
     }
 }

@@ -8,18 +8,17 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class ModificationMedia extends Model
 {
-
     /**
      * The attributes that can't be filled.
      *
      * @var array
      */
     protected $guarded = ['id'];
+
     protected $casts = [
         'action' => MediaActionEnum::class,
-        'condition_columns' => 'json'
+        'condition_columns' => 'json',
     ];
-
 
     public function media(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {

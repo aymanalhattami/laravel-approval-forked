@@ -15,6 +15,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 class ApproveMedia
 {
     private Modification|ModificationRelation $modification;
+
     private Model $model;
 
     public static function make(): static

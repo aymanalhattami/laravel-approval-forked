@@ -15,20 +15,16 @@ class Approval extends Model
 
     /**
      * Get models that the approval belongs to.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function approver()
+    public function approver(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
         return $this->morphTo();
     }
 
     /**
      * Return RegisterModification relation via direct relation.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function modification()
+    public function modification(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(config('approval.models.modification', \Approval\Models\Modification::class));
     }

@@ -2,10 +2,10 @@
 
 namespace Approval\Tests\Unit;
 
-use Approval\Tests\TestCase;
-use Approval\Tests\Models\User;
-use Approval\Tests\Models\Post;
 use Approval\Models\Modification;
+use Approval\Tests\Models\Post;
+use Approval\Tests\Models\User;
+use Approval\Tests\TestCase;
 
 class ApprovalTest extends TestCase
 {
@@ -36,14 +36,13 @@ class ApprovalTest extends TestCase
         $this->assertTrue($modification->modifications['content']['modified'] == $newContent);
     }
 
-
     public function testDisapprovalProcessCreatedOnUpdate()
     {
         auth()->login(User::first());
 
         $post = Post::first();
 
-        $oldTitle =  $post->title;
+        $oldTitle = $post->title;
         $oldContent = $post->content;
 
         $newTitle = 'Trigger Approval';
@@ -56,7 +55,7 @@ class ApprovalTest extends TestCase
 
         $modification = $post->modifications()->first();
 
-        User::first()->disapprove($modification, "I dont like the new title.");
+        User::first()->disapprove($modification, 'I dont like the new title.');
 
         $this->assertNotEmpty($post->modifications);
 
@@ -69,7 +68,7 @@ class ApprovalTest extends TestCase
         auth()->login(User::first());
 
         $post = Post::create([
-            'title'   => 'Trigger Approval',
+            'title' => 'Trigger Approval',
             'content' => 'Sweet Carrot',
         ]);
 
@@ -89,49 +88,43 @@ class ApprovalTest extends TestCase
         auth()->login(User::first());
 
         Post::create([
-            'title'   => 'Trigger Approval',
+            'title' => 'Trigger Approval',
             'content' => 'Sweet Carrot',
         ]);
 
         $modification = Modification::creations()->first();
 
+        User::first()->approve($modification, 'You have create a great post');
 
-        User::first()->approve($modification, "You have create a great post");
-
-
-        $this->assertEquals("You have create a great post", $modification->approvals()->first()->reason);
+        $this->assertEquals('You have create a great post', $modification->approvals()->first()->reason);
     }
-
 
     public function testItCanAddReasonToDisapprove()
     {
         auth()->login(User::first());
 
         Post::create([
-            'title'   => 'Trigger Approval',
+            'title' => 'Trigger Approval',
             'content' => 'Sweet Carrot',
         ]);
 
         $modification = Modification::creations()->first();
 
+        User::first()->disapprove($modification, 'Your post is not complete!');
 
-        User::first()->disapprove($modification, "Your post is not complete!");
-
-        $this->assertEquals("Your post is not complete!", $modification->disapprovals()->first()->reason);
+        $this->assertEquals('Your post is not complete!', $modification->disapprovals()->first()->reason);
     }
-
 
     public function testItCanAddReasonToDisapproval()
     {
         auth()->login(User::first());
 
         Post::create([
-            'title'   => 'Trigger Approval',
+            'title' => 'Trigger Approval',
             'content' => 'Sweet Carrot',
         ]);
 
         $modification = Modification::creations()->first();
-
 
         User::first()->disapprove($modification);
 

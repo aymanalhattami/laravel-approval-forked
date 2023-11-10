@@ -10,6 +10,6 @@ class Comment extends Model
     use RequiresApproval;
 
     protected $fillable = [
-      'content',
+        'content',
     ];
 }

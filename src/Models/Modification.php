@@ -28,45 +28,37 @@ class Modification extends Model implements HasMedia
 
     /**
      * Get models that the modification belongs to.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function modifiable()
+    public function modifiable(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
         return $this->morphTo();
     }
 
     /**
      * Get models that the ignited this modification.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function modifier()
+    public function modifier(): \Illuminate\Database\Eloquent\Relations\MorphTo
     {
         return $this->morphTo();
     }
 
     /**
      * Return Approval relations via direct relation.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function approvals()
+    public function approvals(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(config('approval.models.approval', \Approval\Models\Approval::class));
     }
 
     /**
      * Return Disapproval relations via direct relation.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function disapprovals()
+    public function disapprovals(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(config('approval.models.disapproval', \Approval\Models\Disapproval::class));
     }
 
-    public function modificationRelations()
+    public function modificationRelations(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(config('approval.models.modificationRelation', \Approval\Models\ModificationRelation::class));
     }
@@ -74,10 +66,8 @@ class Modification extends Model implements HasMedia
     /**
      * Get the number of approvals reamaining for the changes
      * to be approved and approval will close.
-     *
-     * @return int
      */
-    public function getApproversRemainingAttribute()
+    public function getApproversRemainingAttribute(): int
     {
         return $this->approvers_required - $this->approvals()->count();
     }
@@ -85,40 +75,32 @@ class Modification extends Model implements HasMedia
     /**
      * Get the number of disapprovals reamaining for the changes
      * to be disapproved and approval will close.
-     *
-     * @return int
      */
-    public function getDisapproversRemainingAttribute()
+    public function getDisapproversRemainingAttribute(): int
     {
         return $this->disapprovers_required - $this->disapprovals()->count();
     }
 
     /**
      * Convenience alias of ApproversRemaining attribute.
-     *
-     * @return int
      */
-    public function getApprovalsRemainingAttribute()
+    public function getApprovalsRemainingAttribute(): int
     {
         return $this->approversRemaining;
     }
 
     /**
      * Convenience alias of DisapproversRemaining attribute.
-     *
-     * @return int
      */
-    public function getDisapprovalsRemainingAttribute()
+    public function getDisapprovalsRemainingAttribute(): int
     {
         return $this->disapproversRemaining;
     }
 
     /**
      * Force apply changes to modifiable.
-     *
-     * @return void
      */
-    public function forceApprovalUpdate()
+    public function forceApprovalUpdate(): void
     {
         $this->modifiable->applyModificationChanges($this, true);
     }
@@ -126,11 +108,9 @@ class Modification extends Model implements HasMedia
     /**
      * Scope to only include active modifications.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      */
-    public function scopeActiveOnly($query)
+    public function scopeActiveOnly($query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('active', true);
     }
@@ -138,11 +118,9 @@ class Modification extends Model implements HasMedia
     /**
      * Scope to only include inactive modifications.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      */
-    public function scopeInactiveOnly($query)
+    public function scopeInactiveOnly($query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('active', false);
     }
@@ -150,11 +128,9 @@ class Modification extends Model implements HasMedia
     /**
      * Scope to only retrieve changed models.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      */
-    public function scopeChanges($query)
+    public function scopeChanges($query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('is_update', true);
     }
@@ -162,11 +138,9 @@ class Modification extends Model implements HasMedia
     /**
      * Scope to only retrieve created models.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      */
-    public function scopeCreations($query)
+    public function scopeCreations($query): \Illuminate\Database\Eloquent\Builder
     {
         return $query->where('is_update', false);
     }

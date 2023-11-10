@@ -9,11 +9,17 @@ use Approval\Models\ModificationRelation;
 class RegisterModificationRelation
 {
     private string $modelName;
+
     private array $data = [];
+
     private Modification $modification;
+
     private ModificationRelation $modificationRelation;
+
     private string $foreignIdColumn;
+
     private ActionEnum $action = ActionEnum::Create;
+
     private array $conditionColumns = [];
 
     public static function make(): self
@@ -102,14 +108,14 @@ class RegisterModificationRelation
     {
         $modifiedData = [];
 
-        foreach ($this->getData() as $key => $value){
+        foreach ($this->getData() as $key => $value) {
             $modifiedData[$key] = ['modified' => $value, 'original' => null];
         }
 
         return $modifiedData;
     }
 
-    public function save():self
+    public function save(): self
     {
         $this->modificationRelation = ModificationRelation::create([
             'modification_id' => $this->getModification()->id,

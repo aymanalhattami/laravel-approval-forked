@@ -8,10 +8,8 @@ class ApprovalServiceProvider extends ServiceProvider
 {
     /**
      * Boot up Approval.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->registerConfigurations();
         $this->registerMigrations();
@@ -19,10 +17,8 @@ class ApprovalServiceProvider extends ServiceProvider
 
     /**
      * Register Approval configs.
-     *
-     * @return void
      */
-    private function registerConfigurations()
+    private function registerConfigurations(): void
     {
         $this->publishes([
             __DIR__.'/Config/config.php' => config_path('approval.php'),
@@ -31,10 +27,8 @@ class ApprovalServiceProvider extends ServiceProvider
 
     /**
      * Register Approval migrations.
-     *
-     * @return void
      */
-    private function registerMigrations()
+    private function registerMigrations(): void
     {
         $this->publishes([
             __DIR__.'/Migrations' => database_path('migrations'),

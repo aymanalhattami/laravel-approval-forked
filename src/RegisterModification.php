@@ -10,9 +10,13 @@ use Illuminate\Support\Facades\Auth;
 class RegisterModification
 {
     private string $modelName;
-    private string|null $modelId = null;
+
+    private ?string $modelId = null;
+
     private array $data = [];
+
     private Modification $modification;
+
     private bool $isUpdate = false;
 
     public static function make(): self
@@ -35,7 +39,7 @@ class RegisterModification
         return $this;
     }
 
-    private function getModelId(): string|null
+    private function getModelId(): ?string
     {
         return $this->modelId;
     }
@@ -80,8 +84,8 @@ class RegisterModification
     {
         $modifiedData = [];
 
-        if(count($this->getData())){
-            foreach ($this->getData() as $key => $value){
+        if (count($this->getData())) {
+            foreach ($this->getData() as $key => $value) {
                 $modifiedData[$key] = ['modified' => $value, 'original' => null];
             }
         }
@@ -89,7 +93,7 @@ class RegisterModification
         return $modifiedData;
     }
 
-    public function save():self
+    public function save(): self
     {
         $this->modification = Modification::create([
             'modifiable_type' => $this->getModelName(),
@@ -98,7 +102,7 @@ class RegisterModification
             'modifier_type' => Auth::user()::class,
             'is_update' => $this->isUpdate,
             'md5' => md5(Carbon::now()->format('Y-m-d-H-i-s')),
-            'modifications' => $this->getModifiedData()
+            'modifications' => $this->getModifiedData(),
         ]);
 
         return $this;

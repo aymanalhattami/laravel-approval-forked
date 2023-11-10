@@ -2,7 +2,7 @@
 
 namespace Approval\Enums;
 
-# TODO:: rename to RelationAction
+// TODO:: rename to RelationAction
 enum ActionEnum: string
 {
     case Create = 'create';

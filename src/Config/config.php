@@ -15,12 +15,12 @@ return [
     */
 
     'models' => [
-      'modification' => \Approval\Models\Modification::class,
-      'approval'     => \Approval\Models\Approval::class,
-      'disapproval'  => \Approval\Models\Disapproval::class,
-      'modificationRelation'  => \Approval\Models\ModificationRelation::class,
+        'modification' => \Approval\Models\Modification::class,
+        'approval' => \Approval\Models\Approval::class,
+        'disapproval' => \Approval\Models\Disapproval::class,
+        'modificationRelation' => \Approval\Models\ModificationRelation::class,
     ],
 
     'disk_name' => env('MODIFICATION_DISK_NAME', 'public'),
-    'collection_name' => env('MODIFICATION_COLLECTION_NAME', 'modification')
+    'collection_name' => env('MODIFICATION_COLLECTION_NAME', 'modification'),
 ];

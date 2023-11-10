@@ -4,76 +4,59 @@ namespace Approval\Traits;
 
 use Approval\ApproveMedia;
 use Approval\ApproveRelation;
-use Approval\Enums\ActionEnum;
-use Approval\Enums\MediaActionEnum;
 use Approval\Models\Modification;
-use Approval\Models\ModificationMedia;
-use Approval\Models\ModificationRelation;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 trait RequiresApproval
 {
     /**
      * Number of approvers this model requires in order
      * to mark the modifications as accepted.
-     *
-     * @var int
      */
-    protected $approversRequired = 1;
+    protected int $approversRequired = 1;
 
     /**
      * Number of disapprovers this model requires in order
      * to mark the modifications as rejected.
-     *
-     * @var int
      */
-    protected $disapproversRequired = 1;
+    protected int $disapproversRequired = 1;
 
     /**
      * Boolean to mark whether or not this model should be updated
      * automatically upon receiving the required number of approvals.
-     *
-     * @var bool
      */
-    protected $updateWhenApproved = true;
+    protected bool $updateWhenApproved = true;
 
     /**
      * Boolean to mark whether or not the approval model should be deleted
      * automatically when the approval is disapproved wtih the required number
      * of disapprovals.
-     *
-     * @var bool
      */
-    protected $deleteWhenDisapproved = false;
+    protected bool $deleteWhenDisapproved = false;
 
     /**
      * Boolean to mark whether or not the approval model should be deleted
      * automatically when the approval is approved wtih the required number
      * of approvals.
-     *
-     * @var bool
      */
-    protected $deleteWhenApproved = false;
+    protected bool $deleteWhenApproved = false;
 
     /**
      * Boolean to mark whether or not the approval model should be saved
      * forcefully.
-     *
-     * @var bool
      */
-    private $forcedApprovalUpdate = false;
+    private bool $forcedApprovalUpdate = false;
 
     /**
      * Boot the RequiresApproval trait. Listen for events and perform logic.
      */
-    public static function bootRequiresApproval()
+    public static function bootRequiresApproval(): void
     {
         static::saving(function ($item) {
-            if (!$item->isForcedApprovalUpdate() && $item->requiresApprovalWhen($item->getDirty()) === true) {
+            if (! $item->isForcedApprovalUpdate() && $item->requiresApprovalWhen($item->getDirty()) === true) {
                 return self::captureSave($item);
             }
 
@@ -85,20 +68,16 @@ trait RequiresApproval
 
     /**
      * Returns true if the model is being force updated.
-     *
-     * @return bool
      */
-    public function isForcedApprovalUpdate()
+    public function isForcedApprovalUpdate(): bool
     {
         return $this->forcedApprovalUpdate;
     }
 
     /**
      * Setter for forcedApprovalUpdate.
-     *
-     * @return bool
      */
-    public function setForcedApprovalUpdate($forced = true)
+    public function setForcedApprovalUpdate($forced = true): bool
     {
         return $this->forcedApprovalUpdate = $forced;
     }
@@ -107,16 +86,14 @@ trait RequiresApproval
      * Function that defines the rule of when an approval process
      * should be actioned for this model.
      *
-     * @param array $modifications
-     *
-     * @return bool
+     * @param  array  $modifications
      */
     protected function requiresApprovalWhen($modifications): bool
     {
         return true;
     }
 
-    public static function captureSave($item)
+    public static function captureSave($item): false
     {
         $diff = collect($item->getDirty())
             ->transform(function ($change, $key) use ($item) {
@@ -155,7 +132,7 @@ trait RequiresApproval
 
         $modification->save();
 
-        if (!$hasModificationPending) {
+        if (! $hasModificationPending) {
             $item->modifications()->save($modification);
         }
 
@@ -164,44 +141,37 @@ trait RequiresApproval
 
     /**
      * Return RegisterModification relations via moprhMany.
-     *
-     * @return MorphMany
      */
-    public function modifications()
+    public function modifications(): MorphMany
     {
         return $this->morphMany(config('approval.models.modification', Modification::class), 'modifiable');
     }
 
     /**
      * Returns the model that should be used as the modifier of the modified model.
-     *
-     * @return mixed
      */
-    protected function modifier()
+    protected function modifier(): mixed
     {
         return auth()->user();
     }
 
     /**
      * Return collection of creations for the current model
-     *
-     * @return Collection
      */
-    public static function creations()
+    public static function creations(): Collection
     {
         $modificationClass = config('approval.models.modification', Modification::class);
+
         return $modificationClass::whereModifiableType(static::class)->whereIsUpdate(false)->get();
     }
 
     /**
      * Apply modification to model.
-     *
-     * @return void
      */
     public function applyModificationChanges(Modification $modification, bool $approved): void
     {
         if ($approved && $this->updateWhenApproved) {
-            DB::transaction(function () use ($modification, $approved) {
+            DB::transaction(function () use ($modification) {
                 $this->setForcedApprovalUpdate(true);
 
                 foreach ($modification->modifications as $key => $mod) {

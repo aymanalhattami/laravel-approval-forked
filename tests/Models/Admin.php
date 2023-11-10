@@ -10,6 +10,6 @@ class Admin extends Model
     use ApprovesChanges;
 
     protected $fillable = [
-      'name',
+        'name',
     ];
 }
