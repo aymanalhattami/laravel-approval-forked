@@ -5,6 +5,8 @@ namespace Approval;
 use Approval\Enums\ActionEnum;
 use Approval\Models\Modification;
 use Approval\Models\ModificationRelation;
+use Closure;
+use Exception;
 
 class CreateModificationRelation
 {
@@ -16,7 +18,7 @@ class CreateModificationRelation
 
     private ModificationRelation $modificationRelation;
 
-    private string $foreignIdColumn;
+    private string|Closure $foreignIdColumn;
 
     private ActionEnum $action = ActionEnum::Create;
 
@@ -80,7 +82,7 @@ class CreateModificationRelation
         return $this->modelName;
     }
 
-    public function setForeignIdColumn(string $foreignIdColumn): static
+    public function setForeignIdColumn(string|Closure $foreignIdColumn): static
     {
         $this->foreignIdColumn = $foreignIdColumn;
 
@@ -89,7 +91,7 @@ class CreateModificationRelation
 
     private function getForeignIdColumn(): string
     {
-        return $this->foreignIdColumn;
+        return $this->foreignIdColumn instanceof Closure ? ($this->foreignIdColumn)() : $this->foreignIdColumn;
     }
 
     public function setData(array $data = []): self
@@ -127,5 +129,23 @@ class CreateModificationRelation
         ]);
 
         return $this;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function saveMany(array $modificationRelations): void
+    {
+        if (count($modificationRelations)) {
+            foreach ($modificationRelations as $modificationRelation) {
+                if ($modificationRelation instanceof CreateModificationRelation) {
+                    $modificationRelation
+                        ->setModification($this->getModification())
+                        ->save();
+                } else {
+                    throw new Exception('modification relations array should be an instance of App\Approvals\ModificationRelation');
+                }
+            }
+        }
     }
 }

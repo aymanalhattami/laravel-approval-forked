@@ -3,9 +3,12 @@
 namespace Approval;
 
 use Approval\Models\Modification;
+use Approval\Models\ModificationRelation;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CreateModification
 {
@@ -19,9 +22,24 @@ class CreateModification
 
     private bool $isUpdate = false;
 
+    private array $modificationRelations;
+
+
     public static function make(): self
     {
         return new static;
+    }
+
+    public function getModificationRelations(): array
+    {
+        return $this->modificationRelations;
+    }
+
+    public function setModificationRelations(array $modificationRelations): static
+    {
+        $this->modificationRelations = $modificationRelations;
+
+        return $this;
     }
 
     public function setModel(Model $model): static
@@ -95,15 +113,21 @@ class CreateModification
 
     public function save(): self
     {
-        $this->modification = Modification::create([
-            'modifiable_type' => $this->getModelName(),
-            'modifiable_id' => $this->getModelId(),
-            'modifier_id' => Auth::id(),
-            'modifier_type' => Auth::user()::class,
-            'is_update' => $this->isUpdate,
-            'md5' => md5(Carbon::now()->format('Y-m-d-H-i-s')),
-            'modifications' => $this->getModifiedData(),
-        ]);
+        DB::transaction(function () {
+            $this->modification = Modification::create([
+                'modifiable_type' => $this->getModelName(),
+                'modifiable_id' => $this->getModelId(),
+                'modifier_id' => Auth::id(),
+                'modifier_type' => Auth::user()::class,
+                'is_update' => $this->isUpdate,
+                'md5' => md5(Carbon::now()->format('Y-m-d-H-i-s')),
+                'modifications' => $this->getModifiedData(),
+            ]);
+
+            CreateModificationRelation::make()
+                ->setModification($this->getModification())
+                ->saveMany($this->getModificationRelations());
+        });
 
         return $this;
     }
