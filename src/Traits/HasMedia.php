@@ -2,11 +2,14 @@
 
 namespace Approval\Traits;
 
+use Approval\CreateMedia;
+use Approval\CreateModificationRelation;
 use Approval\Enums\MediaActionEnum;
 use Approval\Models\Modification;
 use Approval\Models\ModificationMedia;
 use Approval\Models\ModificationRelation;
 use Closure;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
@@ -198,5 +201,25 @@ trait HasMedia
         });
 
         return $this;
+    }
+
+    /**
+     * @throws FileIsTooBig
+     * @throws FileDoesNotExist
+     * @throws Exception
+     */
+    public function saveMany(array $modificationMedias): void
+    {
+        if (count($modificationMedias)) {
+            foreach ($modificationMedias as $modificationMedia) {
+                if ($modificationMedia instanceof CreateMedia) {
+                    $modificationMedia
+                        ->setModel($this->getModel())
+                        ->save();
+                } else {
+                    throw new Exception('modification media array should be an instance of App\Approvals\CreateMedia');
+                }
+            }
+        }
     }
 }

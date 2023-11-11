@@ -22,6 +22,8 @@ class CreateModification
 
     private array $modificationRelations;
 
+    private array $modificationMedias;
+
 
     public static function make(): self
     {
@@ -36,6 +38,18 @@ class CreateModification
     public function setModificationRelations(array $modificationRelations): static
     {
         $this->modificationRelations = $modificationRelations;
+
+        return $this;
+    }
+
+    public function getModificationMedias(): array
+    {
+        return $this->modificationMedias;
+    }
+
+    public function setModificationMedias(array $modificationMedias): static
+    {
+        $this->modificationMedias = $modificationMedias;
 
         return $this;
     }
@@ -126,6 +140,12 @@ class CreateModification
                 CreateModificationRelation::make()
                     ->setModification($this->getModification())
                     ->saveMany($this->getModificationRelations());
+            }
+
+            if(count($this->getModificationMedias())){
+                CreateMedia::make()
+                    ->setModel($this->getModification())
+                    ->saveMany($this->getModificationMedias());
             }
         });
 
