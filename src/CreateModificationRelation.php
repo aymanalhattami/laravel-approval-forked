@@ -7,6 +7,8 @@ use Approval\Models\Modification;
 use Approval\Models\ModificationRelation;
 use Closure;
 use Exception;
+use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class CreateModificationRelation
 {
@@ -24,9 +26,23 @@ class CreateModificationRelation
 
     private array $conditionColumns = [];
 
+    private array $modificationMedias = [];
+
     public static function make(): self
     {
         return new static;
+    }
+
+    public function getModificationMedias(): array
+    {
+        return $this->modificationMedias;
+    }
+
+    public function setModificationMedias(array $modificationMedias): static
+    {
+        $this->modificationMedias = $modificationMedias;
+
+        return $this;
     }
 
     private function getConditionColumns(): array
@@ -117,22 +133,34 @@ class CreateModificationRelation
         return $modifiedData;
     }
 
+    /**
+     * @throws Throwable
+     */
     public function save(): self
     {
-        $this->modificationRelation = ModificationRelation::create([
-            'modification_id' => $this->getModification()->id,
-            'model' => $this->getModelName(),
-            'foreign_id_column' => $this->getForeignIdColumn(),
-            'modifications' => $this->getModifiedData(),
-            'action' => $this->getAction()->value,
-            'condition_columns' => $this->getConditionColumns(),
-        ]);
+        DB::transaction(function(){
+            $this->modificationRelation = ModificationRelation::create([
+                'modification_id' => $this->getModification()->id,
+                'model' => $this->getModelName(),
+                'foreign_id_column' => $this->getForeignIdColumn(),
+                'modifications' => $this->getModifiedData(),
+                'action' => $this->getAction()->value,
+                'condition_columns' => $this->getConditionColumns(),
+            ]);
+
+            if(count($this->getModificationMedias())){
+                CreateMedia::make()
+                    ->setModel($this->getModificationRelation())
+                    ->saveMany($this->getModificationMedias());
+            }
+        });
 
         return $this;
     }
 
     /**
      * @throws Exception
+     * @throws Throwable
      */
     public function saveMany(array $modificationRelations): void
     {

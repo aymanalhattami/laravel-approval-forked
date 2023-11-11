@@ -81,7 +81,7 @@ class ApproveModificationRelation
 
             ApproveMedia::make()
                 ->setModification($modificationRelation)
-                ->setModel($this->getModel())
+                ->setModel($modificationRelationModel)
                 ->save();
         }
     }
@@ -114,7 +114,7 @@ class ApproveModificationRelation
 
             ApproveMedia::make()
                 ->setModification($modificationRelation)
-                ->setModel($this->getModel())
+                ->setModel($modificationRelationModel)
                 ->save();
         }
     }
@@ -161,7 +161,7 @@ class ApproveModificationRelation
 
             ApproveMedia::make()
                 ->setModification($modificationRelation)
-                ->setModel($this->getModel())
+                ->setModel($modificationRelationModel)
                 ->save();
         }
     }
@@ -195,7 +195,7 @@ class ApproveModificationRelation
 
                     ApproveMedia::make()
                         ->setModification($modificationRelation)
-                        ->setModel($this->getModel())
+                        ->setModel($modificationRelationModel)
                         ->save();
                 }
             }
