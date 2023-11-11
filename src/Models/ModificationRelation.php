@@ -31,4 +31,9 @@ class ModificationRelation extends Model implements HasMedia
     {
         return $this->belongsTo(config('approval.models.modification', Modification::class));
     }
+
+    public function modificationMedias(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(ModificationMedia::class, 'model');
+    }
 }

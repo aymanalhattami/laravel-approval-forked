@@ -63,6 +63,11 @@ class Modification extends Model implements HasMedia
         return $this->hasMany(config('approval.models.modificationRelation', \Approval\Models\ModificationRelation::class));
     }
 
+    public function modificationMedias(): \Illuminate\Database\Eloquent\Relations\MorphMany
+    {
+        return $this->morphMany(ModificationMedia::class, 'model');
+    }
+
     /**
      * Get the number of approvals reamaining for the changes
      * to be approved and approval will close.
