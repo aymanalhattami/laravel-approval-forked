@@ -3,8 +3,6 @@
 namespace Approval;
 
 use Approval\Models\Modification;
-use Approval\Models\ModificationRelation;
-use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -124,9 +122,11 @@ class CreateModification
                 'modifications' => $this->getModifiedData(),
             ]);
 
-            CreateModificationRelation::make()
-                ->setModification($this->getModification())
-                ->saveMany($this->getModificationRelations());
+            if (count($this->getModificationRelations())) {
+                CreateModificationRelation::make()
+                    ->setModification($this->getModification())
+                    ->saveMany($this->getModificationRelations());
+            }
         });
 
         return $this;
