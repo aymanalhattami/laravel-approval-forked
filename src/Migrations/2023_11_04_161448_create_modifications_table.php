@@ -21,7 +21,7 @@ return new class extends Migration
             // TODO:: use morph('modifier')
             $table->integer('modifier_id')->nullable();
             $table->string('modifier_type')->nullable();
-            $table->boolean('active')->default(true);
+            $table->string('status')->default(\Approval\Enums\ModificationStatusEnum::Pending->value);
             $table->string('action')->default(\Approval\Enums\ActionEnum::Create->value);
             $table->integer('approvers_required')->default(1);
             $table->integer('disapprovers_required')->default(1);

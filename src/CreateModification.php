@@ -22,9 +22,9 @@ class CreateModification
 
 //    private bool $isUpdate = false;
 
-    private Closure|array $modificationRelations;
+    private Closure|array $modificationRelations = [];
 
-    private Closure|array $modificationMedias;
+    private Closure|array $modificationMedias = [];
 
     private ActionEnum $actionEnum = ActionEnum::Create;
 

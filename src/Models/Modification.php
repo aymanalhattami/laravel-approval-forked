@@ -3,6 +3,7 @@
 namespace Approval\Models;
 
 use Approval\Enums\ActionEnum;
+use Approval\Enums\ModificationStatusEnum;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -112,25 +113,25 @@ class Modification extends Model implements HasMedia
         $this->modifiable->applyModificationChanges($this, true);
     }
 
-    /**
-     * Scope to only include active modifications.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     */
-    public function scopeActiveOnly($query): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->where('active', true);
-    }
-
-    /**
-     * Scope to only include inactive modifications.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     */
-    public function scopeInactiveOnly($query): \Illuminate\Database\Eloquent\Builder
-    {
-        return $query->where('active', false);
-    }
+//    /**
+//     * Scope to only include active modifications.
+//     *
+//     * @param  \Illuminate\Database\Eloquent\Builder  $query
+//     */
+//    public function scopeActiveOnly($query): \Illuminate\Database\Eloquent\Builder
+//    {
+//        return $query->where('active', true);
+//    }
+//
+//    /**
+//     * Scope to only include inactive modifications.
+//     *
+//     * @param  \Illuminate\Database\Eloquent\Builder  $query
+//     */
+//    public function scopeInactiveOnly($query): \Illuminate\Database\Eloquent\Builder
+//    {
+//        return $query->where('active', false);
+//    }
 
 //    /**
 //     * Scope to only retrieve changed models.
@@ -146,6 +147,21 @@ class Modification extends Model implements HasMedia
 //    {
 //        return $query->where('is_update', false);
 //    }
+
+    public function scopePending($query)
+    {
+        return $query->where('status', ModificationStatusEnum::Pending->value);
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('status', ModificationStatusEnum::Approved->value);
+    }
+
+    public function scopeDisapproved($query)
+    {
+        return $query->where('status', ModificationStatusEnum::Disapproved->value);
+    }
 
     public function scopeForCreate($query): \Illuminate\Database\Eloquent\Builder
     {

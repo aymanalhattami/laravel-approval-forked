@@ -5,6 +5,7 @@ namespace Approval\Traits;
 use Approval\ApproveMedia;
 use Approval\ApproveModificationRelation;
 use Approval\Enums\ActionEnum;
+use Approval\Enums\ModificationStatusEnum;
 use Approval\Models\Modification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -105,7 +106,7 @@ trait RequiresApproval
             })->all();
 
         $hasModificationPending = $item->modifications()
-            ->activeOnly()
+            ->pending()
             ->where('md5', md5(json_encode($diff)))
             ->first();
 
@@ -114,7 +115,7 @@ trait RequiresApproval
         $modificationModel = config('approval.models.modification', Modification::class);
 
         $modification = $hasModificationPending ?? new $modificationModel();
-        $modification->active = true;
+        $modification->action = ModificationStatusEnum::Pending->value;
         $modification->modifications = $diff;
         $modification->approvers_required = $item->approversRequired;
         $modification->disapprovers_required = $item->disapproversRequired;
@@ -184,7 +185,7 @@ trait RequiresApproval
                 if ($this->deleteWhenApproved) {
                     $modification->delete();
                 } else {
-                    $modification->active = false;
+                    $modification->status = ModificationStatusEnum::Approved->value;
                     $modification->save();
                 }
 
@@ -201,7 +202,7 @@ trait RequiresApproval
             if ($this->deleteWhenDisapproved) {
                 $modification->delete();
             } else {
-                $modification->active = false;
+                $modification->status = ModificationStatusEnum::Disapproved->value;
                 $modification->save();
             }
         }
