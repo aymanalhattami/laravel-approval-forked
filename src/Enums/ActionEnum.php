@@ -17,8 +17,8 @@ enum ActionEnum: string
             self::Create => 'Create',
             self::Update => 'Update',
             self::Delete => 'Delete',
-            self::UpdateOrCreate => 'Update or create',
-            self::DeleteThenCreate => 'Delete then create',
+            self::UpdateOrCreate => 'Update if exists or create if not',
+            self::DeleteThenCreate => 'Delete all then create',
         };
     }
 }
