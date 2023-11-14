@@ -2,7 +2,7 @@
 
 namespace Approval;
 
-use Approval\Enums\ActionEnum;
+use Approval\Enums\RelationActionEnum;
 use Approval\Models\Modification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -49,15 +49,15 @@ class ApproveModificationRelation
             $relations = $this->getModification()->modificationRelations->groupBy('action');
 
             foreach ($relations as $key => $modificationRelations) {
-                if ($key == ActionEnum::Create->value) {
+                if ($key == RelationActionEnum::Create->value) {
                     $this->create($modificationRelations);
-                } elseif ($key == ActionEnum::Update->value) {
+                } elseif ($key == RelationActionEnum::Update->value) {
                     $this->update($modificationRelations);
-                } elseif ($key == ActionEnum::Delete->value) {
+                } elseif ($key == RelationActionEnum::Delete->value) {
                     $this->delete($modificationRelations);
-                } elseif ($key == ActionEnum::UpdateOrCreate->value) {
+                } elseif ($key == RelationActionEnum::UpdateOrCreate->value) {
                     $this->updateOrCreate($modificationRelations);
-                } elseif ($key == ActionEnum::DeleteThenCreate->value) {
+                } elseif ($key == RelationActionEnum::DeleteThenCreate->value) {
                     $this->deleteThenCreate($modificationRelations);
                 } else {
                     $this->create($modificationRelations);

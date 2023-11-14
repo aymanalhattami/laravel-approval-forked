@@ -2,7 +2,7 @@
 
 namespace Approval;
 
-use Approval\Enums\ActionEnum;
+use Approval\Enums\RelationActionEnum;
 use Approval\Models\Modification;
 use Approval\Models\ModificationRelation;
 use Closure;
@@ -22,7 +22,7 @@ class CreateModificationRelation
 
     private string|Closure $foreignIdColumn;
 
-    private ActionEnum $action = ActionEnum::Create;
+    private RelationActionEnum $action = RelationActionEnum::Create;
 
     private array $conditionColumns = [];
 
@@ -57,12 +57,12 @@ class CreateModificationRelation
         return $this;
     }
 
-    private function getAction(): ActionEnum
+    private function getAction(): RelationActionEnum
     {
         return $this->action;
     }
 
-    public function setAction(ActionEnum $action): self
+    public function setAction(RelationActionEnum $action): self
     {
         $this->action = $action;
 

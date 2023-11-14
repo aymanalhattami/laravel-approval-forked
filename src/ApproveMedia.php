@@ -2,7 +2,7 @@
 
 namespace Approval;
 
-use Approval\Enums\ActionEnum;
+use Approval\Enums\RelationActionEnum;
 use Approval\Enums\MediaActionEnum;
 use Approval\Models\Modification;
 use Approval\Models\ModificationMedia;
@@ -63,7 +63,7 @@ class ApproveMedia
                         $this->create($modificationMedia);
                     } elseif ($key == MediaActionEnum::Delete->value) {
                         $this->delete($modificationMedia);
-                    } elseif ($key == ActionEnum::DeleteThenCreate->value) {
+                    } elseif ($key == MediaActionEnum::DeleteThenCreate->value) {
                         $this->deleteThenCreate($modificationMedia);
                     } else {
                         $this->create($modificationMedia);
