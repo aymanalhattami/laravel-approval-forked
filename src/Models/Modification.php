@@ -2,6 +2,7 @@
 
 namespace Approval\Models;
 
+use Approval\Enums\ActionEnum;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -24,6 +25,7 @@ class Modification extends Model implements HasMedia
      */
     protected $casts = [
         'modifications' => 'json',
+        'action' => ActionEnum::class
     ];
 
     /**
@@ -130,23 +132,33 @@ class Modification extends Model implements HasMedia
         return $query->where('active', false);
     }
 
-    /**
-     * Scope to only retrieve changed models.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     */
-    public function scopeChanges($query): \Illuminate\Database\Eloquent\Builder
+//    /**
+//     * Scope to only retrieve changed models.
+//     *
+//     * @param  \Illuminate\Database\Eloquent\Builder  $query
+//     */
+//    public function scopeChanges($query): \Illuminate\Database\Eloquent\Builder
+//    {
+//        return $query->where('is_update', true);
+//    }
+
+//    public function scopeCreations($query): \Illuminate\Database\Eloquent\Builder
+//    {
+//        return $query->where('is_update', false);
+//    }
+
+    public function scopeForCreate($query): \Illuminate\Database\Eloquent\Builder
     {
-        return $query->where('is_update', true);
+        return $query->where('action', ActionEnum::Create->value);
     }
 
-    /**
-     * Scope to only retrieve created models.
-     *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     */
-    public function scopeCreations($query): \Illuminate\Database\Eloquent\Builder
+    public function scopeForDelete($query): \Illuminate\Database\Eloquent\Builder
     {
-        return $query->where('is_update', false);
+        return $query->where('action', ActionEnum::Delete->value);
+    }
+
+    public function scopeForUpdate($query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->where('action', ActionEnum::Update->value);
     }
 }

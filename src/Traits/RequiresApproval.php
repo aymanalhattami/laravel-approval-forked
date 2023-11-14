@@ -4,6 +4,7 @@ namespace Approval\Traits;
 
 use Approval\ApproveMedia;
 use Approval\ApproveModificationRelation;
+use Approval\Enums\ActionEnum;
 use Approval\Models\Modification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -127,7 +128,7 @@ trait RequiresApproval
         }
 
         if (is_null($item->{$item->getKeyName()})) {
-            $modification->is_update = false;
+            $modification->action = ActionEnum::Create;
         }
 
         $modification->save();
@@ -162,7 +163,7 @@ trait RequiresApproval
     {
         $modificationClass = config('approval.models.modification', Modification::class);
 
-        return $modificationClass::whereModifiableType(static::class)->whereIsUpdate(false)->get();
+        return $modificationClass::whereModifiableType(static::class)->whereAction(ActionEnum::Create->value)->get();
     }
 
     /**

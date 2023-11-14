@@ -2,6 +2,7 @@
 
 namespace Approval;
 
+use Approval\Enums\ActionEnum;
 use Approval\Models\Modification;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
@@ -19,15 +20,29 @@ class CreateModification
 
     private Modification $modification;
 
-    private bool $isUpdate = false;
+//    private bool $isUpdate = false;
 
     private Closure|array $modificationRelations;
 
     private Closure|array $modificationMedias;
 
+    private ActionEnum $actionEnum = ActionEnum::Create;
+
     public static function make(): self
     {
         return new static;
+    }
+
+    public function getActionEnum(): ActionEnum
+    {
+        return $this->actionEnum;
+    }
+
+    public function setActionEnum(ActionEnum $actionEnum): self
+    {
+        $this->actionEnum = $actionEnum;
+
+        return $this;
     }
 
     public function getModificationRelations(): array
@@ -62,12 +77,12 @@ class CreateModification
         return $this;
     }
 
-    public function isUpdate(bool $value = true): self
-    {
-        $this->isUpdate = $value;
-
-        return $this;
-    }
+//    public function isUpdate(bool $value = true): self
+//    {
+//        $this->isUpdate = $value;
+//
+//        return $this;
+//    }
 
     private function getModelId(): ?string
     {
@@ -131,7 +146,7 @@ class CreateModification
                 'modifiable_id' => $this->getModelId(),
                 'modifier_id' => Auth::id(),
                 'modifier_type' => Auth::user()::class,
-                'is_update' => $this->isUpdate,
+                'action' => $this->getActionEnum(),
                 'md5' => md5(Carbon::now()->format('Y-m-d-H-i-s')),
                 'modifications' => $this->getModifiedData(),
             ]);
