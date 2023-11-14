@@ -3,6 +3,7 @@
 namespace Approval;
 
 use Approval\Models\Modification;
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -20,9 +21,9 @@ class CreateModification
 
     private bool $isUpdate = false;
 
-    private array $modificationRelations;
+    private Closure|array $modificationRelations;
 
-    private array $modificationMedias;
+    private Closure|array $modificationMedias;
 
 
     public static function make(): self
@@ -32,10 +33,10 @@ class CreateModification
 
     public function getModificationRelations(): array
     {
-        return $this->modificationRelations;
+        return $this->modificationRelations instanceof Closure ? ($this->modificationRelations)() : $this->modificationRelations;
     }
 
-    public function setModificationRelations(array $modificationRelations): static
+    public function setModificationRelations(Closure|array $modificationRelations): static
     {
         $this->modificationRelations = $modificationRelations;
 
@@ -44,10 +45,10 @@ class CreateModification
 
     public function getModificationMedias(): array
     {
-        return $this->modificationMedias;
+        return $this->modificationMedias instanceof Closure ? ($this->modificationMedias)() : $this->modificationMedias;
     }
 
-    public function setModificationMedias(array $modificationMedias): static
+    public function setModificationMedias(Closure|array $modificationMedias): static
     {
         $this->modificationMedias = $modificationMedias;
 
