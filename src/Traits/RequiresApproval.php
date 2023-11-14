@@ -115,7 +115,7 @@ trait RequiresApproval
         $modificationModel = config('approval.models.modification', Modification::class);
 
         $modification = $hasModificationPending ?? new $modificationModel();
-        $modification->action = ModificationStatusEnum::Pending->value;
+        $modification->status = ModificationStatusEnum::Pending->value;
         $modification->modifications = $diff;
         $modification->approvers_required = $item->approversRequired;
         $modification->disapprovers_required = $item->disapproversRequired;
