@@ -25,7 +25,6 @@ class CreateModification
 
     private Closure|array $modificationMedias;
 
-
     public static function make(): self
     {
         return new static;
@@ -143,7 +142,7 @@ class CreateModification
                     ->saveMany($this->getModificationRelations());
             }
 
-            if(count($this->getModificationMedias())){
+            if (count($this->getModificationMedias())) {
                 CreateMedia::make()
                     ->setModel($this->getModification())
                     ->saveMany($this->getModificationMedias());

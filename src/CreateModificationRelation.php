@@ -138,7 +138,7 @@ class CreateModificationRelation
      */
     public function save(): self
     {
-        DB::transaction(function(){
+        DB::transaction(function () {
             $this->modificationRelation = ModificationRelation::create([
                 'modification_id' => $this->getModification()->id,
                 'model' => $this->getModelName(),
@@ -148,7 +148,7 @@ class CreateModificationRelation
                 'condition_columns' => $this->getConditionColumns(),
             ]);
 
-            if(count($this->getModificationMedias())){
+            if (count($this->getModificationMedias())) {
                 CreateMedia::make()
                     ->setModel($this->getModificationRelation())
                     ->saveMany($this->getModificationMedias());

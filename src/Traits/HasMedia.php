@@ -3,7 +3,6 @@
 namespace Approval\Traits;
 
 use Approval\CreateMedia;
-use Approval\CreateModificationRelation;
 use Approval\Enums\MediaActionEnum;
 use Approval\Models\Modification;
 use Approval\Models\ModificationMedia;

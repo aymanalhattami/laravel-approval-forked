@@ -2,7 +2,6 @@
 
 namespace Approval;
 
-use Approval\Enums\RelationActionEnum;
 use Approval\Enums\MediaActionEnum;
 use Approval\Models\Modification;
 use Approval\Models\ModificationMedia;
