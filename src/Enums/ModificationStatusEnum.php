@@ -16,4 +16,15 @@ enum ModificationStatusEnum: string
             self::Disapproved => 'Disapproved',
         };
     }
+    
+    public static function toArray(): array
+    {
+        $enums = [];
+
+        foreach (static::cases() as $status) {
+            $enums[$status->value] = $status->label();
+        }
+
+        return $enums;
+    }
 }

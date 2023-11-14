@@ -16,4 +16,15 @@ enum ActionEnum: string
             self::Delete => 'Delete',
         };
     }
+
+    public static function toArray(): array
+    {
+        $enums = [];
+
+        foreach (static::cases() as $status) {
+            $enums[$status->value] = $status->label();
+        }
+
+        return $enums;
+    }
 }
