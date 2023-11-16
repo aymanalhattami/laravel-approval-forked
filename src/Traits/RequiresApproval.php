@@ -182,6 +182,10 @@ trait RequiresApproval
 
                 $this->save();
 
+                if($modification->action == ActionEnum::Create){
+                    $modification->modifiable_id = $this->id;
+                }
+
                 if ($this->deleteWhenApproved) {
                     $modification->delete();
                 } else {
