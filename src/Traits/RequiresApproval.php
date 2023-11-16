@@ -8,9 +8,7 @@ use Approval\Enums\ActionEnum;
 use Approval\Enums\ModificationStatusEnum;
 use Approval\Models\Modification;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Support\Facades\DB;
 
 trait RequiresApproval
 {
@@ -173,35 +171,33 @@ trait RequiresApproval
     public function applyModificationChanges(Modification $modification, bool $approved): void
     {
         if ($approved && $this->updateWhenApproved) {
-            DB::transaction(function () use ($modification) {
-                $this->setForcedApprovalUpdate(true);
+            $this->setForcedApprovalUpdate(true);
 
-                foreach ($modification->modifications as $key => $mod) {
-                    $this->{$key} = $mod['modified'];
-                }
+            foreach ($modification->modifications as $key => $mod) {
+                $this->{$key} = $mod['modified'];
+            }
 
-                $this->save();
+            $this->save();
 
-                if($modification->action == ActionEnum::Create){
-                    $modification->modifiable_id = $this->id;
-                }
+            if($modification->action == ActionEnum::Create){
+                $modification->modifiable_id = $this->id;
+            }
 
-                if ($this->deleteWhenApproved) {
-                    $modification->delete();
-                } else {
-                    $modification->status = ModificationStatusEnum::Approved;
-                    $modification->save();
-                }
+            if ($this->deleteWhenApproved) {
+                $modification->delete();
+            } else {
+                $modification->status = ModificationStatusEnum::Approved;
+                $modification->save();
+            }
 
-                ApproveModificationRelation::make()
-                    ->setModel($this)
-                    ->setModification($modification)
-                    ->save();
-                ApproveMedia::make()
-                    ->setModification($modification)
-                    ->setModel($this)
-                    ->save();
-            });
+            ApproveModificationRelation::make()
+                ->setModel($this)
+                ->setModification($modification)
+                ->save();
+            ApproveMedia::make()
+                ->setModification($modification)
+                ->setModel($this)
+                ->save();
         } elseif ($approved === false) {
             if ($this->deleteWhenDisapproved) {
                 $modification->delete();
