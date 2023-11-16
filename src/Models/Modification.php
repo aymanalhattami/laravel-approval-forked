@@ -26,7 +26,8 @@ class Modification extends Model implements HasMedia
      */
     protected $casts = [
         'modifications' => 'json',
-        'action' => ActionEnum::class
+        'action' => ActionEnum::class,
+        'status' => ModificationStatusEnum::class,
     ];
 
     /**
@@ -150,31 +151,31 @@ class Modification extends Model implements HasMedia
 
     public function scopePending($query)
     {
-        return $query->where('status', ModificationStatusEnum::Pending->value);
+        return $query->where('status', ModificationStatusEnum::Pending);
     }
 
     public function scopeApproved($query)
     {
-        return $query->where('status', ModificationStatusEnum::Approved->value);
+        return $query->where('status', ModificationStatusEnum::Approved);
     }
 
     public function scopeDisapproved($query)
     {
-        return $query->where('status', ModificationStatusEnum::Disapproved->value);
+        return $query->where('status', ModificationStatusEnum::Disapproved);
     }
 
     public function scopeForCreate($query): \Illuminate\Database\Eloquent\Builder
     {
-        return $query->where('action', ActionEnum::Create->value);
+        return $query->where('action', ActionEnum::Create);
     }
 
     public function scopeForDelete($query): \Illuminate\Database\Eloquent\Builder
     {
-        return $query->where('action', ActionEnum::Delete->value);
+        return $query->where('action', ActionEnum::Delete);
     }
 
     public function scopeForUpdate($query): \Illuminate\Database\Eloquent\Builder
     {
-        return $query->where('action', ActionEnum::Update->value);
+        return $query->where('action', ActionEnum::Update);
     }
 }

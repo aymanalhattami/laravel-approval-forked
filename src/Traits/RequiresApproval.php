@@ -115,7 +115,7 @@ trait RequiresApproval
         $modificationModel = config('approval.models.modification', Modification::class);
 
         $modification = $hasModificationPending ?? new $modificationModel();
-        $modification->status = ModificationStatusEnum::Pending->value;
+        $modification->status = ModificationStatusEnum::Pending;
         $modification->modifications = $diff;
         $modification->approvers_required = $item->approversRequired;
         $modification->disapprovers_required = $item->disapproversRequired;
@@ -128,8 +128,8 @@ trait RequiresApproval
             $modification->modifier_type = $modifierClass;
         }
 
-        if (is_null($item->{$item->getKeyName()})) {
-            $modification->action = ActionEnum::Create;
+        if (!is_null($item->{$item->getKeyName()})) {
+            $modification->action = ActionEnum::Update;
         }
 
         $modification->save();
@@ -185,7 +185,7 @@ trait RequiresApproval
                 if ($this->deleteWhenApproved) {
                     $modification->delete();
                 } else {
-                    $modification->status = ModificationStatusEnum::Approved->value;
+                    $modification->status = ModificationStatusEnum::Approved;
                     $modification->save();
                 }
 
@@ -202,7 +202,7 @@ trait RequiresApproval
             if ($this->deleteWhenDisapproved) {
                 $modification->delete();
             } else {
-                $modification->status = ModificationStatusEnum::Disapproved->value;
+                $modification->status = ModificationStatusEnum::Disapproved;
                 $modification->save();
             }
         }
