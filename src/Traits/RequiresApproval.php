@@ -57,7 +57,7 @@ trait RequiresApproval
     {
         static::saving(function ($item) {
             if (! $item->isForcedApprovalUpdate() && $item->requiresApprovalWhen($item->getDirty()) === true) {
-                return self::captureSave($item);
+                return self::saveToModification($item);
             }
 
             $item->setForcedApprovalUpdate(false);
@@ -93,7 +93,7 @@ trait RequiresApproval
         return true;
     }
 
-    public static function captureSave($item): false
+    public static function saveToModification($item): false
     {
         $diff = collect($item->getDirty())
             ->transform(function ($change, $key) use ($item) {
