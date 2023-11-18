@@ -14,7 +14,7 @@ class CreateModificationRelation
 {
     private string $modelName;
 
-    private array $data = [];
+    private Closure|array $data = [];
 
     private Modification $modification;
 
@@ -110,7 +110,7 @@ class CreateModificationRelation
         return $this->foreignIdColumn instanceof Closure ? ($this->foreignIdColumn)() : $this->foreignIdColumn;
     }
 
-    public function setData(array $data = []): self
+    public function setData(Closure|array $data = []): self
     {
         $this->data = $data;
 
@@ -119,7 +119,7 @@ class CreateModificationRelation
 
     private function getData(): array
     {
-        return $this->data;
+        return $this->data instanceof Closure ? ($this->data)() : $this->data;
     }
 
     private function getModifiedData(): array
