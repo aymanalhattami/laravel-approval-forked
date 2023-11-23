@@ -51,6 +51,11 @@ trait RequiresApproval
     private bool $forcedApprovalUpdate = false;
 
     /**
+     * @var bool disable approval when seeding data from command
+     */
+    protected bool $disableApprovalWhenRunningInConsole = true;
+
+    /**
      * Boot the RequiresApproval trait. Listen for events and perform logic.
      */
     public static function bootRequiresApproval(): void
@@ -90,6 +95,9 @@ trait RequiresApproval
      */
     protected function requiresApprovalWhen($modifications): bool
     {
+        if(app()->runningInConsole() == true && $this->disableApprovalWhenRunningInConsole == true){
+            return false;
+        }
         return true;
     }
 
