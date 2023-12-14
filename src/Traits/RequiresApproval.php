@@ -95,7 +95,7 @@ trait RequiresApproval
      */
     protected function requiresApprovalWhen($modifications): bool
     {
-        if(app()->runningInConsole() == true && $this->disableApprovalWhenRunningInConsole == true){
+        if(app()->runningInConsole() == true || $this->disableApprovalWhenRunningInConsole == true){
             return false;
         }
         return true;
