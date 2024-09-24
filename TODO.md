@@ -4,6 +4,6 @@
 - delete 
 - update_or_create
 - delete_then_create
-_ force_delete
-- restore
+_ force_delete [future]
+- restore [future]
 
